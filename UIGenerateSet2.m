@@ -18,7 +18,7 @@ for j = 1:5
     pos(j:5:45+j) = p-1+j;
 end
 for k = 1:r
-    
+end
 for i = 1:50
     B(1:30) = A(1,pos(i)-l:pos(i));
     B(31:60) = A(2,pos(i) - l:pos(i));

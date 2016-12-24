@@ -7,6 +7,7 @@ files = files(3:end,:);
 [numData,~] = size(files);
 numData = numData*64; %extract 8 sets each each with 8 elements from the data set
 ctr=1;
+cd ..
 for j = 1:numData
 filename = files(j,:);
 [~,l_filename] =size(filename); 
@@ -18,11 +19,15 @@ p = ginput(8);
 p = floor(p(:,1));
 pos = zeros(1,64);
 for i = 1:8
-    pos(i:8:64+i) = p(i)-1+i;
+    pos(i:8:64-1+i) = p-1+i;
 end
-for i = 1:50
-    x(ctr,:,:) = A(:,pos(i)-600:pos(i));
-    d(ctr,:,:) = str2num(filename(l_filename-4));
+for i = 1:64
+    x(ctr,:,:) = A(pos(i)-599:pos(i),:);
+    d(ctr,str2num(filename(l_filename-4)))=0;
 end
 end
+x = reshape(x,[],1);
+csvwrite('input.csv',x);
+d = reshape(d,[],1);
+csvwrite('desired.csv',d);
 status = 'Done';

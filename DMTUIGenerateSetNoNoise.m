@@ -3,12 +3,12 @@ function status = DMTUIGenerateSetNoNoise()
 %numData*64
 cd DMTdata
 files = ls;
-files = files(3:end,:);
+files = files(3,:);
 [numData,~] = size(files);
 numData = numData*64; %extract 8 sets each each with 8 elements from the data set
 ctr=1;
 cd ..
-for j = 1:numData
+for j = 1:numData/64
 filename = files(j,:);
 [~,l_filename] =size(filename); 
 d = zeros(numData,5);
@@ -22,8 +22,15 @@ for i = 1:8
     pos(i:8:64-1+i) = p-1+i;
 end
 for i = 1:64
-    x(ctr,:,:) = A(:,pos(i)-600:pos(i));
-    d(ctr,str2num(filename(l_filename-4)))=0;
+    x(ctr,:,:) = A(pos(i)-599:pos(i),:);
+    d(ctr,str2num(filename(l_filename-4)))=1;
+    ctr=ctr+1;
 end
 end
+x = reshape(x,[],1);
+%x = reshape(x,[],600,5);
+csvwrite('input.csv',x);
+d = reshape(d,[],1);
+%d = reshape(d,[],5);
+csvwrite('desired.csv',d);
 status = 'Done';

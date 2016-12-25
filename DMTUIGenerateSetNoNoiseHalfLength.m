@@ -3,7 +3,7 @@ function status = DMTUIGenerateSetNoNoiseHalfLength()
 %numData*64
 cd DMTdata
 files = ls;
-files = files(3:5,:);
+files = files(3:end,:);
 [numData,~] = size(files);
 numData = numData*64; %extract 8 sets each each with 8 elements from the data set
 ctr=1;
@@ -28,7 +28,7 @@ for i = 1:64
 end
 end
 x = reshape(x,[],1);
-%x = reshape(x,[],600,5);
+%x = reshape(x,[],300,5);
 csvwrite('input.csv',x);
 d = reshape(d,[],1);
 %d = reshape(d,[],5);

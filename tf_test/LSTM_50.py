@@ -38,7 +38,7 @@ test_d = desired_values[train_idx:,:]
 train_x = np.transpose(train_x,(2,1,0))
 test_x = np.transpose(test_x,(2,1,0))
 
-learning_rate = 0.001
+learning_rate = 0.005
 training_iters = 1000000
 display_step = 5
 
@@ -76,7 +76,7 @@ def RNN(x, weights, biases):
 
     # Define a lstm cell with tensorflow
     lstm_cell = rnn_cell.BasicLSTMCell(n_hidden, forget_bias=1.0,state_is_tuple = True)
-    lstm_cell = rnn_cell.MultiRNNCell([lstm_cell]*2,state_is_tuple = True)
+    lstm_cell = rnn_cell.MultiRNNCell([lstm_cell]*4,state_is_tuple = True)
 
     # Get lstm cell output
     outputs, states = rnn.rnn(lstm_cell, x, dtype=tf.float32)

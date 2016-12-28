@@ -6,7 +6,7 @@ from tensorflow.python.ops import rnn, rnn_cell
 import math
 import numpy as np
 
-print('program starting ...')
+print('starting LSTM with dropouts ...')
 
 desired_dataframe = pd.read_csv('desired.csv',sep = ',', header = None)
 desired_values = desired_dataframe.values[:,0]
@@ -48,10 +48,11 @@ n_steps = 300 # timesteps
 n_hidden = 16 # hidden layer num of features
 n_classes = 5 # MNIST total classes (0-9 digits)
 
+
 # tf Graph input
 x = tf.placeholder("float", [None, n_steps, n_input])
 y = tf.placeholder("float", [None, n_classes])
-
+dropout = tf.placeholder(tf.float32)
 # Define weights
 weights = {
     'out': tf.Variable(tf.random_normal([n_hidden, n_classes]))
@@ -76,6 +77,7 @@ def RNN(x, weights, biases):
 
     # Define a lstm cell with tensorflow
     lstm_cell = rnn_cell.BasicLSTMCell(n_hidden, forget_bias=1.0,state_is_tuple = True)
+    lstm_cell = tf.nn.rnn_cell.DropoutWrapper(lstm_cell, output_keep_prob=0.5)
     lstm_cell = rnn_cell.MultiRNNCell([lstm_cell]*4,state_is_tuple = True)
 
     # Get lstm cell output

@@ -8,11 +8,11 @@ import numpy as np
 
 print('program starting ...')
 
-desired_dataframe = pd.read_csv('d_rand_order.csv',sep = ',', header = None)
+desired_dataframe = pd.read_csv('desired.csv',sep = ',', header = None)
 desired_values = desired_dataframe.values[:,0]
 desired_values = np.transpose(desired_values.reshape((5,-1)))
 
-input_dataframe = pd.read_csv('i_rand_order.csv',sep = ',',header = None)
+input_dataframe = pd.read_csv('input.csv',sep = ',',header = None)
 input_values = np.array(input_dataframe.values[:,0],dtype = 'float')
 input_values = input_values.reshape((5,300,-1))
 
@@ -30,16 +30,17 @@ for j in range(total_size):
     input_values[:,:,j] = standardize_set(input_values[:,:,j])
 
 train_idx = batch_size = int(math.floor(total_size*0.8))
-train_x = input_values[:,:,:train_idx]
-train_d = desired_values[:train_idx,:]
-test_x = input_values[:,:,train_idx:]
-test_d = desired_values[train_idx:,:]
+test_idx = total_size - train_idx
+test_x = input_values[:,:,:test_idx]
+test_d = desired_values[:test_idx,:]
+train_x = input_values[:,:,test_idx:]
+train_d = desired_values[test_idx:,:]
 
 train_x = np.transpose(train_x,(2,1,0))
 test_x = np.transpose(test_x,(2,1,0))
 
 learning_rate = 0.005
-training_iters = 10000000
+training_iters = 1000000
 display_step = 5
 
 # Network Parameters

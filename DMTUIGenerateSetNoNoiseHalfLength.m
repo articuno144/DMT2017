@@ -22,9 +22,12 @@ for i = 1:8
     pos(i:8:64-1+i) = p-1+i;
 end
 for i = 1:64
+    try
     x(ctr,:,:) = A(pos(i)-299:pos(i),:);
     d(ctr,str2num(filename(l_filename-4)))=1;
     ctr=ctr+1;
+    catch
+    end
 end
 end
 x = reshape(x,[],1);

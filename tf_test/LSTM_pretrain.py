@@ -8,11 +8,11 @@ import numpy as np
 
 print('program starting ...')
 
-desired_dataframe = pd.read_csv('d2.csv',sep = ',', header = None)
+desired_dataframe = pd.read_csv('d3.csv',sep = ',', header = None)
 desired_values = desired_dataframe.values[:,0]
 desired_values = np.transpose(desired_values.reshape((5,-1)))
 
-input_dataframe = pd.read_csv('x2.csv',sep = ',',header = None)
+input_dataframe = pd.read_csv('x3.csv',sep = ',',header = None)
 input_values = np.array(input_dataframe.values[:,0],dtype = 'float')
 input_values = input_values.reshape((5,300,-1))
 

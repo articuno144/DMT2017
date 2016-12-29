@@ -18,19 +18,21 @@ idx_pers_train = zeros(1,5*24);
 idx_pers_test = zeros(1,5*40);
 tmp_idx = 1:24:120;
 for i = 1:24
-    idx_pers_train(tmp_idx+i-1) = idx_newgest(1:5)+i-1;
+    idx_pers_train(tmp_idx+i-1) = idx_newgest(6:10)+i-1;
 end
 tmp_idx = 1:40:200;
 for i = 1:40
-    idx_pers_test(tmp_idx+i-1) = idx_newgest_test(1:5)+i-1;
+    idx_pers_test(tmp_idx+i-1) = idx_newgest_test(6:10)+i-1;
 end
-x1 = zeros(idx_newpers(2)-1,300,5);
-d1 = zeros(idx_newpers(2)-1,5);
-x1(1:3072,:,:) = x(1:3072,:,:);
-x1(3072+1:3072+120,:,:) = x(idx_pers_train,:,:);
-x1(3072+121:end,:,:) = x(idx_pers_test,:,:);
-d1(1:3072,:) = d(1:3072,:);
-d1(3073:3192,:) = d(idx_pers_train,:);
-d1(3193:end,:) = d(idx_pers_test,:);
-csvwrite('x1.csv',x1);
-csvwrite('d1.csv',d1);
+x2 = zeros(idx_newpers(2)-1,300,5);
+d2 = zeros(idx_newpers(2)-1,5);
+x2(1:3072,:,:) = x(1:3072,:,:);
+x2(3072+1:3072+120,:,:) = x(idx_pers_train,:,:);
+x2(3072+121:end,:,:) = x(idx_pers_test,:,:);
+d2(1:3072,:) = d(1:3072,:);
+d2(3073:3192,:) = d(idx_pers_train,:);
+d2(3193:end,:) = d(idx_pers_test,:);
+x2 = reshape(x2,[],1);
+d2 = reshape(d2,[],1);
+csvwrite('x2.csv',x2);
+csvwrite('d2.csv',d2);

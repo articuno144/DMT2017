@@ -16,3 +16,9 @@ plot(C*200);
 xlabel('time')
 ylabel('signal strength')
 legend('MMG1','MMG2','gesture recognised')
+to_print = '[';
+for i = 1:1002
+    to_print = [to_print,',',num2str(C(i))];
+end
+to_print = [to_print,']'];
+print(to_print)

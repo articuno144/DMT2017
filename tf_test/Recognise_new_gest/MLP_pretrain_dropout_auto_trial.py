@@ -24,20 +24,15 @@ def standardize_set(arr):
     a3 = np.multiply(np.add(arr[3,:],-250),0.01)
     a4 = np.multiply(np.add(arr[4,:],-250),0.01)
     return np.array([a0,a1,a2,a3,a4])
-#take sample from the current user
+
 in1 = standardize_set(pd.read_csv('s9g1.csv',sep = ',',header = None).values.transpose())
 in2 = standardize_set(pd.read_csv('s9g2.csv',sep = ',',header = None).values.transpose())
 in3 = standardize_set(pd.read_csv('s9g3.csv',sep = ',',header = None).values.transpose())
 in4 = standardize_set(pd.read_csv('s9g4.csv',sep = ',',header = None).values.transpose())
 in5 = standardize_set(pd.read_csv('s9g5.csv',sep = ',',header = None).values.transpose())
 
-len1 = in1.shape[1]
-len2 = in2.shape[1]
-len3 = in3.shape[1]
-len4 = in4.shape[1]
-len5 = in5.shape[1]
 
-def format_to_600(x,i):
+def evaluate_cost(x,i):
     return np.concatenate([x[3,i-300:i],x[4,i-300:i]])
 
 five, threehundred, total_size = input_values.shape
@@ -109,13 +104,6 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 init = tf.global_variables_initializer()
 print("prep finished, starting ...")
 # Launch the graph
-
-pred1 = []
-pred2 = []
-pred3 = []
-pred4 = []
-pred5 = []
-
 with tf.Session() as sess:
     sess.run(init)
     step = 1
@@ -135,40 +123,11 @@ with tf.Session() as sess:
                   "{:.6f}".format(acc))
         step += 1
     print("Pretraining finished, starting to train on specific data!")
-#use pretraining data to find where the gestures are, as lists of indices
-    for i in range(len1-300):
-        t_i = i+300
-        _input = format_to_600(in1,t_i).reshape([-1,600])
+    for i in range(700):
+        t_i = i+302;
+        _input = evaluate_cost(in2,t_i).reshape([-1,600])
         _pred = sess.run(pred_softmax, feed_dict = {x: _input, keep_prob:1.0})
-        if _pred.reshape([-1,5])[0][0]>=0.9:
-            pred1.append(i+300)
-    for i in range(len2-300):
-        t_i = i+300
-        _input = format_to_600(in2,t_i).reshape([-1,600])
-        _pred = sess.run(pred_softmax, feed_dict = {x: _input, keep_prob:1.0})
-        if _pred.reshape([-1,5])[0][1]>=0.9:
-            pred2.append(i+300)
-    for i in range(len3-300):
-        t_i = i+300
-        _input = format_to_600(in3,t_i).reshape([-1,600])
-        _pred = sess.run(pred_softmax, feed_dict = {x: _input, keep_prob:1.0})
-        if _pred.reshape([-1,5])[0][2]>=0.9:
-            pred3.append(i+300)
-    for i in range(len4-300):
-        t_i = i+300
-        _input = format_to_600(in4,t_i).reshape([-1,600])
-        _pred = sess.run(pred_softmax, feed_dict = {x: _input, keep_prob:1.0})
-        if _pred.reshape([-1,5])[0][3]>=0.9:
-            pred4.append(i+300)
-    for i in range(len5-300):
-        t_i = i+300
-        _input = format_to_600(in5,t_i).reshape([-1,600])
-        _pred = sess.run(pred_softmax, feed_dict = {x: _input, keep_prob:1.0})
-        if _pred.reshape([-1,5])[0][4]>=0.9:
-            pred5.append(i+300)
-    #find 3 mean locations for each index list
-    means1 = k_mean.k_mean_index(np.array(pred1),5)
-    means2 = k_mean.k_mean_index(np.array(pred2),5)
-    means3 = k_mean.k_mean_index(np.array(pred3),5)
-    means4 = k_mean.k_mean_index(np.array(pred4),5)
-    means5 = k_mean.k_mean_index(np.array(pred5),5)
+        print(_pred.reshape([-1,5]))
+        all_pred[i] = _pred.reshape([-1,5])
+    print(all_pred)
+    np.savetxt("auto_preds.csv", all_pred, delimiter=",")

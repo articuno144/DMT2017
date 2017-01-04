@@ -24,6 +24,21 @@ def standardize_set(arr):
     a3 = np.multiply(np.add(arr[3,:],-250),0.01)
     a4 = np.multiply(np.add(arr[4,:],-250),0.01)
     return np.array([a0,a1,a2,a3,a4])
+
+def generate_specific_sets(inputs,mean_indices,gesture,post_x,post_d):
+    #append the right inputs to post_x and outputs to post_d, inputs takes the shape like in1, in2 ...
+    for index in mean_indices:
+        for i in range(8):
+            _input = format_to_600(inputs,max(int(index)+i-4,300)).reshape([1,600])
+            _desired = np.zeros(5).reshape([1,5])
+            #gesture is currently 1-indexing
+            _desired[0,(gesture-1)] = 1
+            #add to post_x and post_d
+            if post_x == None or post_d == None:
+                return _input,_desired
+            else:
+                return np.concatenate((post_x,_input),axis = 0),np.concatenate((post_d,_desired),axis = 0)
+
 #take sample from the current user
 in1 = standardize_set(pd.read_csv('s9g1.csv',sep = ',',header = None).values.transpose())
 in2 = standardize_set(pd.read_csv('s9g2.csv',sep = ',',header = None).values.transpose())
@@ -167,8 +182,34 @@ with tf.Session() as sess:
         if _pred.reshape([-1,5])[0][4]>=0.9:
             pred5.append(i+300)
     #find 3 mean locations for each index list
-    means1 = k_mean.k_mean_index(np.array(pred1),5)
-    means2 = k_mean.k_mean_index(np.array(pred2),5)
-    means3 = k_mean.k_mean_index(np.array(pred3),5)
-    means4 = k_mean.k_mean_index(np.array(pred4),5)
-    means5 = k_mean.k_mean_index(np.array(pred5),5)
+    means1 = np.floor(k_mean.k_mean_index(np.array(pred1),4))
+    means2 = np.floor(k_mean.k_mean_index(np.array(pred2),4))
+    means3 = np.floor(k_mean.k_mean_index(np.array(pred3),3))
+    means4 = np.floor(k_mean.k_mean_index(np.array(pred4),4))
+    means5 = np.floor(k_mean.k_mean_index(np.array(pred5),4))
+    print(means1,means2,means3,means4,means5)
+    #use the locations to generate training sets
+    post_x = None
+    post_d = None
+    post_x,post_d = generate_specific_sets(in1,means1,1,post_x,post_d)
+    post_x,post_d = generate_specific_sets(in2,means2,2,post_x,post_d)
+    post_x,post_d = generate_specific_sets(in3,means3,3,post_x,post_d)
+    post_x,post_d = generate_specific_sets(in4,means4,4,post_x,post_d)
+    post_x,post_d = generate_specific_sets(in5,means5,5,post_x,post_d)
+    #while loop to train the network with the specific set
+    step = 1
+    while step<1000:
+        batch_x, batch_y = post_x, post_d
+        # Reshape data to get 28 seq of 28 elements
+        #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+        # Run optimization op (backprop)
+        sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5})
+        if step % display_step == 0:
+            # Calculate batch accuracy
+            acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
+            # Calculate batch loss
+            # loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
+            print("Iter " + str(step*batch_size) + ", Minibatch Accuracy= " + \
+                  "{:.6f}".format(acc))
+        step += 1
+    print("All Done!")

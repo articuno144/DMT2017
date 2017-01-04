@@ -7,7 +7,7 @@ def k_mean_index(indices,num_classes):
     means = np.zeros(num_classes)
     new_means = np.zeros(num_classes)
     for i in range(num_classes):
-        new_means[i] = min(indices)+(max(indices)-min(indices))*((i+0.5)/num_classes)
+        new_means[i] = indices[math.floor((i+0.5)*num_indices/num_classes)]
     while(not(np.allclose(new_means,means))):
         means = np.copy(new_means)
         member_total = np.zeros(num_classes)

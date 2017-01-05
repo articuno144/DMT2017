@@ -16,6 +16,14 @@ desired_values = np.transpose(desired_values.reshape((5,-1)))
 input_dataframe = pd.read_csv('x_pretrain.csv',sep = ',',header = None)
 input_values = np.array(input_dataframe.values[:,0],dtype = 'float')
 input_values = input_values.reshape((5,300,-1))
+
+t_desired_dataframe = pd.read_csv('test_desired.csv',sep = ',', header = None)
+t_desired_values = t_desired_dataframe.values[:,0]
+t_desired_values = np.transpose(t_desired_values.reshape((5,-1)))
+
+t_input_dataframe = pd.read_csv('test_input.csv',sep = ',',header = None)
+t_input_values = np.array(t_input_dataframe.values[:,0],dtype = 'float')
+t_input_values = t_input_values.reshape((5,300,-1))
 #standardize the person-specific inputs
 def standardize_set(arr):
     a0 = np.multiply(np.add(arr[0,:],-125),0.01)
@@ -58,10 +66,15 @@ def format_to_600(x,i):
 five, threehundred, total_size = input_values.shape
 for j in range(total_size):
     input_values[:,:,j] = standardize_set(input_values[:,:,j])
+test_size = t_input_values.shape[2]
+for j in range(test_size):
+    t_input_values[:,:,j] = standardize_set(t_input_values[:,:,j])
 
 train_idx = batch_size = 3071
 train_x = input_values[:,:,:train_idx]
 train_d = desired_values[:train_idx,:]
+test_x = t_input_values
+test_d = t_desired_values
 cost = np.empty([700,5])
 all_pred = np.empty([700,5])
 
@@ -70,6 +83,10 @@ for i in range(batch_size):
     tr_x[:,i] = np.concatenate([train_x[3,:,i],train_x[4,:,i]])
 tr_x = np.transpose(tr_x)
 #now the input are of size [batch_size, n_input]
+t_x = np.empty([600,test_size])
+for i in range(test_size):
+    t_x[:,i] = np.concatenate([test_x[3,:,i],test_x[4,:,i]])
+t_x = np.transpose(t_x)
 
 learning_rate = 0.005
 training_iters = 500000
@@ -143,7 +160,7 @@ with tf.Session() as sess:
         sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5})
         if step % display_step == 0:
             # Calculate batch accuracy
-            acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
+            acc = sess.run(accuracy, feed_dict={x: t_x, y: test_d, keep_prob:1.0})
             # Calculate batch loss
             # loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
             print("Iter " + str(step*batch_size) + ", Minibatch Accuracy= " + \
@@ -182,11 +199,11 @@ with tf.Session() as sess:
         if _pred.reshape([-1,5])[0][4]>=0.9:
             pred5.append(i+300)
     #find 3 mean locations for each index list
-    means1 = np.floor(k_mean.k_mean_index(np.array(pred1),4))
+    means1 = np.floor(k_mean.k_mean_index(np.array(pred1),3))
     means2 = np.floor(k_mean.k_mean_index(np.array(pred2),4))
     means3 = np.floor(k_mean.k_mean_index(np.array(pred3),3))
-    means4 = np.floor(k_mean.k_mean_index(np.array(pred4),4))
-    means5 = np.floor(k_mean.k_mean_index(np.array(pred5),4))
+    means4 = np.floor(k_mean.k_mean_index(np.array(pred4),3))
+    means5 = np.floor(k_mean.k_mean_index(np.array(pred5),3))
     print(means1,means2,means3,means4,means5)
     #use the locations to generate training sets
     post_x = None
@@ -206,7 +223,7 @@ with tf.Session() as sess:
         sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5})
         if step % display_step == 0:
             # Calculate batch accuracy
-            acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
+            acc = sess.run(accuracy, feed_dict={x: t_x, y: test_d, keep_prob:1.0})
             # Calculate batch loss
             # loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
             print("Iter " + str(step*batch_size) + ", Minibatch Accuracy= " + \

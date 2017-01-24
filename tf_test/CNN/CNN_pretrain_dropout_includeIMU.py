@@ -10,11 +10,27 @@ print('program starting ...')
 
 desired_dataframe = pd.read_csv('d2.csv',sep = ',', header = None)
 desired_values = desired_dataframe.values[:,0]
-desired_values = np.transpose(desired_values.reshape((5,-1)))
+desired_values = np.transpose(desired_values.reshape((6,-1)))
 
 input_dataframe = pd.read_csv('x2.csv',sep = ',',header = None)
 input_values = np.array(input_dataframe.values[:,0],dtype = 'float')
 input_values = input_values.reshape((5,300,-1))
+
+noise_dataframe = pd.read_csv('noise.csv',sep= ',', header= None)
+noise_values = noise_dataframe.values[:,0]
+noise_values = noise_values.reshape((5,300,-1))
+
+noised_dataframe = pd.read_csv('noised.csv',sep= ',', header= None)
+noised_values = noised_dataframe.values[:,0]
+noised_values = np.transpose(noised_values.reshape((6,-1)))
+
+noiset_dataframe = pd.read_csv('noiset.csv',sep= ',', header= None)
+noiset_values = noiset_dataframe.values[:,0]
+noiset_values = noiset_values.reshape((5,300,-1))
+
+noisetd_dataframe = pd.read_csv('noisetd.csv',sep= ',', header= None)
+noisetd_values = noisetd_dataframe.values[:,0]
+noisetd_values = np.transpose(noisetd_values.reshape((6,-1)))
 
 def standardize_set(arr):
     a0 = np.multiply(np.add(arr[0,:],-125),0.01)
@@ -28,11 +44,14 @@ five, threehundred, total_size = input_values.shape
 for j in range(total_size):
     input_values[:,:,j] = standardize_set(input_values[:,:,j])
 
-train_idx = batch_size = 3071
+batch_size = 3000
+train_idx = 3071
 ptrain_idx = 3191
 test_size = total_size - ptrain_idx
 train_x = input_values[:,:,:train_idx]
+train_x = np.concatenate((train_x,noise_values),2)
 train_d = desired_values[:train_idx,:]
+train_d = np.concatenate((train_d,noised_values),0)
 ptrain_x = input_values[:,:,train_idx:ptrain_idx]
 ptrain_d = desired_values[train_idx:ptrain_idx,:]
 test_x = input_values[:,:,ptrain_idx:]
@@ -50,17 +69,18 @@ test_d = desired_values[ptrain_idx:,:]
 tr_x = np.transpose(train_x,[2,1,0])
 ptr_x = np.transpose(ptrain_x,[2,1,0])
 tst_x = np.transpose(test_x,[2,1,0])
+tstn_x = np.transpose(noiset_values,[2,1,0])
 #now the input are of size [batch_size, n_input]
 
 learning_rate = 0.005
-training_iters = 500000
+training_iters = 1000000
 display_step = 5
 
 # Network Parameters
 n_input = 300 # input size, currently only using col 3,4 (4,5 in matlab)
 n_hidden_1 = 512 # 1st layer number of features
 n_hidden_2 = 512 # 2nd layer number of features
-n_classes = 5 # MNIST total classes (0-9 digits)
+n_classes = 6 # 5 gestures, 1 noise
 
 # tf Graph input
 x = tf.placeholder("float", [None, n_input,5])
@@ -163,9 +183,13 @@ print("prep finished, starting ...")
 sess = tf.InteractiveSession()
 sess.run(init)
 step = 1
+p = 0
 # Keep training until reach max iterations
 while step * batch_size < training_iters:
-    batch_x, batch_y = tr_x, train_d
+    batch_x, batch_y = tr_x[p:p+batch_size,:,:], train_d[p:p+batch_size,:]
+    p+=batch_size
+    if p>=40000:
+        p=0
     # Reshape data to get 28 seq of 28 elements
     #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
     # Run optimization op (backprop)

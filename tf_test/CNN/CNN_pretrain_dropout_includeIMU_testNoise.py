@@ -17,7 +17,11 @@ input_values = np.array(input_dataframe.values[:,0],dtype = 'float')
 input_values = input_values.reshape((5,300,-1))
 
 noise_dataframe = pd.read_csv('noise.csv',sep= ',', header= None)
+<<<<<<< HEAD
 noise_values = np.array(noise_dataframe.values[:,0],dtype = 'float')
+=======
+noise_values = noise_dataframe.values[:,0]
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 noise_values = noise_values.reshape((5,300,-1))
 
 noised_dataframe = pd.read_csv('noised.csv',sep= ',', header= None)
@@ -25,7 +29,11 @@ noised_values = noised_dataframe.values[:,0]
 noised_values = np.transpose(noised_values.reshape((6,-1)))
 
 noiset_dataframe = pd.read_csv('noiset.csv',sep= ',', header= None)
+<<<<<<< HEAD
 noiset_values = np.array(noiset_dataframe.values[:,0],dtype = 'float')
+=======
+noiset_values = noiset_dataframe.values[:,0]
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 noiset_values = noiset_values.reshape((5,300,-1))
 
 noisetd_dataframe = pd.read_csv('noisetd.csv',sep= ',', header= None)
@@ -43,11 +51,16 @@ def standardize_set(arr):
 five, threehundred, total_size = input_values.shape
 for j in range(total_size):
     input_values[:,:,j] = standardize_set(input_values[:,:,j])
+<<<<<<< HEAD
 for j in range(37000):
     noise_values[:,:,j] = standardize_set(noise_values[:,:,j])
 for j in range(5500):
     noiset_values[:,:,j] = standardize_set(noiset_values[:,:,j])
 batch_size = 1000
+=======
+
+batch_size = 3000
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 train_idx = 3071
 ptrain_idx = 3191
 test_size = total_size - ptrain_idx
@@ -73,10 +86,16 @@ tr_x = np.transpose(train_x,[2,1,0])
 ptr_x = np.transpose(ptrain_x,[2,1,0])
 tst_x = np.transpose(test_x,[2,1,0])
 tstn_x = np.transpose(noiset_values,[2,1,0])
+<<<<<<< HEAD
 noise_values = np.transpose(noise_values,[2,1,0])
 #now the input are of size [batch_size, n_input]
 
 learning_rate = tf.placeholder("float")
+=======
+#now the input are of size [batch_size, n_input]
+
+learning_rate = 0.005
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 training_iters = 3000000
 display_step = 5
 
@@ -176,10 +195,15 @@ pred = conv_net(x, weights, biases, keep_prob)
 # Define loss and optimizer
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+<<<<<<< HEAD
 second_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost,var_list=[weights['wd1'],weights['wd2'],weights['out'],biases['bd1'],biases['bd2'],biases['out']])
 # Evaluate model
 correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
 
+=======
+# Evaluate model
+correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
 # Initializing the variables
@@ -199,7 +223,11 @@ while step * batch_size < training_iters:
     # Reshape data to get 28 seq of 28 elements
     #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
     # Run optimization op (backprop)
+<<<<<<< HEAD
     sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5,learning_rate: 0.005})
+=======
+    sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5})
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
     if step % display_step == 0:
         # Calculate batch accuracy
         acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
@@ -212,6 +240,7 @@ while step * batch_size < training_iters:
     step += 1
 print("Pretraining finished, starting to train on specific data!")
 step = 1
+<<<<<<< HEAD
 n = 0
 # Keep training until reach max iterations
 batch_x, batch_y = ptr_x, ptrain_d
@@ -225,6 +254,15 @@ while step * 1000 < training_iters:
     # Run optimization op (backprop)
     sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5,learning_rate : 0.0001})
     sess.run(optimizer, feed_dict={x: noise_x, y: noise_y, keep_prob:0.5,learning_rate : 0.0002})
+=======
+# Keep training until reach max iterations
+batch_x, batch_y = ptr_x, ptrain_d
+while step * 1000 < training_iters:
+    # Reshape data to get 28 seq of 28 elements
+    #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+    # Run optimization op (backprop)
+    sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5})
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
     if step % display_step == 0:
         # Calculate batch accuracy
         acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
@@ -235,6 +273,7 @@ while step * 1000 < training_iters:
         print("Iter " + str(step*120) + ", Minibatch Accuracy= " + \
               "{:.6f}".format(acc) +",Test Accuracy = " +  "{:.6f}".format(test_accuracy)+" ,Noise Accuracy = " + "{:.6f}".format(noise_accuracy))
     step += 1
+<<<<<<< HEAD
 noise_preds = sess.run(tf.argmax(pred,1),feed_dict = {x:tstn_x, keep_prob:1.0})
 noise_d = sess.run(tf.argmax(noisetd_values,1))
 gest_preds = sess.run(tf.argmax(pred,1),feed_dict = {x:tst_x, y :test_d,keep_prob:1.0})
@@ -255,4 +294,6 @@ def tell_diff(arr1, arr2):
 
 tell_diff(gest_d,gest_preds)
 tell_diff(noise_d,noise_preds)
+=======
+>>>>>>> 9ac3e67eabdea5dd73a9fe2443e792d20addc07b
 print("results look ok?")

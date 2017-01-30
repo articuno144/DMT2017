@@ -209,25 +209,25 @@ sess.run(init)
 step = 1
 p = 0
 # Keep training until reach max iterations
-while step * batch_size < training_iters:
-    batch_x, batch_y = tr_x[p:p+batch_size,:,:], train_d[p:p+batch_size,:]
-    p+=batch_size
-    if p>=40000:
-        p=0
-    # Reshape data to get 28 seq of 28 elements
-    #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
-    # Run optimization op (backprop)
-    sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5,learning_rate: 0.005})
-    if step % display_step == 0:
-        # Calculate batch accuracy
-        acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
-        # Calculate batch loss
-        # loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
-        test_accuracy = sess.run(accuracy, feed_dict={x:tst_x,y:test_d,keep_prob:1.0})
-        noise_accuracy = sess.run(accuracy, feed_dict={x: tstn_x, y: noisetd_values, keep_prob:1.0})
-        print("Iter " + str(step*120) + ", Minibatch Accuracy= " + \
-              "{:.6f}".format(acc) +",Test Accuracy = " +  "{:.6f}".format(test_accuracy)+" ,Noise Accuracy = " + "{:.6f}".format(noise_accuracy))
-    step += 1
+##while step * batch_size < training_iters:
+##    batch_x, batch_y = tr_x[p:p+batch_size,:,:], train_d[p:p+batch_size,:]
+##    p+=batch_size
+##    if p>=40000:
+##        p=0
+##    # Reshape data to get 28 seq of 28 elements
+##    #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+##    # Run optimization op (backprop)
+##    sess.run(optimizer, feed_dict={x: batch_x, y: batch_y, keep_prob:0.5,learning_rate: 0.005})
+##    if step % display_step == 0:
+##        # Calculate batch accuracy
+##        acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y, keep_prob:1.0})
+##        # Calculate batch loss
+##        # loss = sess.run(cost, feed_dict={x: batch_x, y: batch_y})
+##        test_accuracy = sess.run(accuracy, feed_dict={x:tst_x,y:test_d,keep_prob:1.0})
+##        noise_accuracy = sess.run(accuracy, feed_dict={x: tstn_x, y: noisetd_values, keep_prob:1.0})
+##        print("Iter " + str(step*120) + ", Minibatch Accuracy= " + \
+##              "{:.6f}".format(acc) +",Test Accuracy = " +  "{:.6f}".format(test_accuracy)+" ,Noise Accuracy = " + "{:.6f}".format(noise_accuracy))
+##    step += 1
 print("Pretraining finished, starting to train on specific data!")
 step = 1
 

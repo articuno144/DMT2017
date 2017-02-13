@@ -4,7 +4,7 @@ This repository is contains the work done for the DMT project 30 (Drones). This 
 **Dependencies:**
 
  - pandas
- - tensorflow 0.10+
+ - tensorflow
  - numpy
  - matplotlib
 

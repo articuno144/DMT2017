@@ -14,10 +14,7 @@ namespace pipe_test_1_c
         {
             // Open the named pipe.
             var server = new NamedPipeServerStream("NPtest");
-            Console.WriteLine("Waiting for connection...");
             server.WaitForConnection();
-
-            Console.WriteLine("Connected.");
             var br = new BinaryReader(server);
             var bw = new BinaryWriter(server);
             char[] charArr = new char[] { (char)1, (char)2, (char)3, (char)4, (char)5 };
@@ -35,14 +32,14 @@ namespace pipe_test_1_c
                     //var str = new string(br.ReadChars(len));    // Read string
                     charArr = br.ReadChars(len);
 
-                    Console.WriteLine(charArr[0] + charArr[1]);
+                    Console.WriteLine(charArr[1]);
 
                     //str = new string(str.Reverse().ToArray());  // Just for fun
 
                     var buf = Encoding.ASCII.GetBytes(charArr);     // Get ASCII byte array     
                     bw.Write((uint)buf.Length);                // Write string length
                     bw.Write(buf);                              // Write string
-                    Console.WriteLine(charArr[0] + charArr[1]);
+                    Console.WriteLine(charArr[1]);
                 }
                 catch (EndOfStreamException)
                 {

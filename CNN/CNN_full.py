@@ -81,7 +81,7 @@ noise_values = np.transpose(noise_values,[2,1,0])
 #now the input are of size [batch_size, n_input]
 
 learning_rate = tf.placeholder("float")
-training_iters = 4000000 #2000000
+training_iters = 400 #2000000
 display_step = 5
 
 # Network Parameters
@@ -230,7 +230,7 @@ while step * batch_size < training_iters:
 print("Pretraining finished, starting to train on specific data!")
 step = 1
 
-saver.save(sess,'Saved\\CNN_pretrain')
+#saver.save(sess,'Saved\\CNN_pretrain')
 
 weights_pretrain = {
     # 5x5 conv, 1 input, 32 outputs
@@ -286,7 +286,7 @@ noise_d = sess.run(tf.argmax(noisetd_values,1))
 gest_preds = sess.run(tf.argmax(pred,1),feed_dict = {x:tst_x, y :test_d,keep_prob:1.0})
 gest_d = sess.run(tf.argmax(test_d,1))
 
-saver.save(sess,'Saved\\CNN_trained')
+#saver.save(sess,'Saved\\CNN_trained')
 
 def tell_diff(arr1, arr2):
     if len(arr1)==len(arr2):

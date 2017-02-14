@@ -148,6 +148,31 @@ def conv_net(x, weights, biases, dropout):
     out = tf.add(tf.matmul(fc, weights['out']), biases['out'])
     return out
 
+weights = {
+    # 5x5 conv, 1 input, 32 outputs
+    'wc1': tf.Variable(tf.random_normal([5, 3, 1, 32])),
+    # 5x5 conv, 32 inputs, 64 outputs
+    'wc2': tf.Variable(tf.random_normal([3, 1, 32, 64])),
+    # fully connected, 7*7*64 inputs, 1024 outputs
+    'wd1': tf.Variable(tf.random_normal([73*64, 1024])),
+    # 1024 inputs, 10 outputs (class prediction)
+    'wc3': tf.Variable(tf.random_normal([3, 3, 1, 32])),
+    # 5x5 conv, 32 inputs, 64 outputs
+    'wc4': tf.Variable(tf.random_normal([5, 1, 32, 64])),
+    # fully connected, 7*7*64 inputs, 1024 outputs
+    'wd2': tf.Variable(tf.random_normal([73*64, 1024])),
+    'out': tf.Variable(tf.random_normal([2048 , n_classes]))
+}
+
+biases = {
+    'bc1': tf.Variable(tf.random_normal([32])),
+    'bc2': tf.Variable(tf.random_normal([64])),
+    'bc3': tf.Variable(tf.random_normal([32])),
+    'bc4': tf.Variable(tf.random_normal([64])),
+    'bd1': tf.Variable(tf.random_normal([1024])),
+    'bd2': tf.Variable(tf.random_normal([1024])),
+    'out': tf.Variable(tf.random_normal([n_classes]))
+}
 # Construct model
 pred = conv_net(x, weights, biases, keep_prob)
 s_pred = tf.sigmoid(pred)

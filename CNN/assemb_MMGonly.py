@@ -63,6 +63,7 @@ print('Read:', list(s))
 
 ##curTime = time.time()
 while True:
+##    ctr+=1
     s = list(s)
     m[0,:49,:] = m[0,1:,:]
     m[0,49,:] = standardize(s)
@@ -72,9 +73,9 @@ while True:
     f.seek(0)                               # EDIT: This is also necessary
 
     n = struct.unpack('I', f.read(4))[0]    # Read str length
-    s = f.read(n)                           # Read str
+    s = f.read(6)                           # Read str
     f.seek(0)                               # Important!!!
-    print('Read:',list(s))
+##    print(ctr,'\t Read:',list(s))
     print('pred: ',p[1])
 ##    ctr+=1
 ##    if ctr==100:

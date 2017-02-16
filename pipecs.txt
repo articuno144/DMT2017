@@ -1,0 +1,75 @@
+//After WorkerClass[] WorkerArray = new WorkerClass[7];
+
+        public byte[] MMGval = new byte[6];
+        int i;
+        public bool pipeConnected = false;
+        bool usingPipe = false;
+        NamedPipeServerStream server;
+        BinaryReader br;
+        BinaryWriter bw;
+        byte[] pipeArr;
+        int pipeCounter = 0;
+
+
+//After public void MATLAB in NUClass.cs
+
+        public void PipeComms(byte[] arrToWrite)
+        {
+            byte[] buf = arrToWrite;
+            bw = new BinaryWriter(server);
+            bw.Write((uint)buf.Length);                // Write string length
+            bw.Write(buf);                              // Write string
+            bw.Flush();
+            var len = (int)br.ReadUInt32();            // Read string length
+            pipeArr = br.ReadBytes(len);
+        }
+
+        void PipeWait()
+        {
+            server = new NamedPipeServerStream("GesturePipe");
+            br = new BinaryReader(server);
+            bw = new BinaryWriter(server);
+            server.WaitForConnection();
+            pipeConnected = true;
+        }
+        void SendThroughPipe(List<int> message)
+        {
+            if (usingPipe)
+            {
+                if (!pipeConnected)
+                {
+                    PipeWait();
+                }
+                pipeCounter++;
+                if (pipeConnected & pipeCounter == 19)
+                {
+                    pipeCounter = 0;
+                    for (i = 0; i < 6; i++)
+                    {
+                        MMGval[i] = (byte)message[i];
+                    }
+                    try
+                    {
+                        PipeComms(MMGval);
+                    }
+                    catch (Exception)
+                    {
+                        pipeConnected = false;
+                        server.Close();
+                        server.Dispose();                     // When client disconnects
+                    }
+                }
+            }
+        }
+
+        void MMGdatain(List<int> message, int GyroValue, bool docked)
+        {
+            if (saveData == true)
+            {
+                //       float val = (message[0] * 256) + message[1];
+                //       try { file.WriteLine((val.ToString())); }
+                //       catch { }
+            }
+            else
+            {
+                SendThroughPipe(message);

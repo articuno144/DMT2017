@@ -12,3 +12,9 @@ This project aims to create an human machine interface (HRI) for drone control. 
 
 ### Gesture Recognition
 Main work for gesture recognition is done in the folder /CNN/. As the name suggests its done with a convolutional neural network. We used 2 convolutional layers for both accelerometer and MMG data, and added two fully connected layers after that.
+
+
+#### Updates
+- update001: downsampling
+- update002: Integrated the tensorflow gesture recognition part with the C# codes through a named pipe
+- update003(ongoing): Gesture Calibration

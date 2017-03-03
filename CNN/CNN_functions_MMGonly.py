@@ -1,5 +1,10 @@
 import tensorflow as tf
 import numpy as np
+import pandas as pd
+
+cali_d = pd.read_csv('cali_d.csv',sep = ',', header = None).values
+
+
 
 n_input = 50 # input size
 n_hidden_1 = 512 # 1st layer number of features
@@ -47,3 +52,4 @@ def conv_net(x, weights, biases, dropout):
     # Output, class prediction
     out = tf.add(tf.matmul(fc2, weights['out']), biases['out'])
     return out
+

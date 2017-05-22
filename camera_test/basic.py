@@ -1,7 +1,7 @@
 import cv2
 
 cv2.namedWindow("preview")
-vc = cv2.VideoCapture(1)
+vc = cv2.VideoCapture(0)
 vc.set(3, 640)
 vc.set(4, 480)
 vc.set(6, 60)

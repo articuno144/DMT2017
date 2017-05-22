@@ -23,19 +23,11 @@ if vc2.isOpened():  # try to get the first frame
 else:
     rval2 = False
 
-<<<<<<< HEAD
-def get_loc(firstframe,gray):
-    ########################### TO DO #################################
-    #print the location of the darkest k regions frame 480*640*3
-    frameDelta = cv2.absdiff(firstframe,gray)  
-    thresh = cv2.threshold(frameDelta, 20, 255, cv2.THRESH_BINARY)[1]  
-=======
 
 def get_loc(firstframe, gray):
     # print the location of the darkest k regions frame 480*640*3
     frameDelta = cv2.absdiff(firstframe, gray)
     thresh = cv2.threshold(frameDelta, 100, 255, cv2.THRESH_BINARY)[1]
->>>>>>> 15bcc71375c22c27f6fce4eee148669adae21fb3
     thresh = cv2.dilate(thresh, None, iterations=2)
     x, y, w, h = cv2.boundingRect(thresh)
     # frame=cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),2)

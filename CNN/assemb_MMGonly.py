@@ -81,7 +81,7 @@ r_prev = 10
 c = 0
 # get training_set
 while True:
-    c+=1
+    c += 1
     # ctr+=1
     s = list(s)
     m[0, :49, :] = m[0, 1:, :]
@@ -89,16 +89,16 @@ while True:
     if s[0] == 0 and r_prev == 1:
         g, t = s[1]-1, s[2]-1
         training_set[g*n_gesture+t, :, :] = np.array(m)
-        c=0
+        c = 0
     if s[0] == 0:
-        if new_noise == None and c>20:
+        if new_noise == None and c > 20:
             new_noise = np.array(m)
             new_noised = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1])
             new_noised = new_noised.reshape((1, 9))
-        elif c>20 and random.randint(0,20)==15:
+        elif c > 20 and random.randint(0, 20) == 15:
             new_noise = np.concatenate((new_noise, np.array(m)), axis=0)
             new_noised = np.concatenate(
-                (new_noised, np.array([0, 0, 0, 0, 0, 0, 0, 0, 1]).reshape((1,9))), axis=0)
+                (new_noised, np.array([0, 0, 0, 0, 0, 0, 0, 0, 1]).reshape((1, 9))), axis=0)
     r_prev = s[0]
     if s[0] > 1:  # training_set ready
         break
@@ -132,7 +132,7 @@ while step * batch_size < training_iters:
              x: batch_x, y: batch_y, keep_prob: 0.5, learning_rate: 0.0001})
     sess.run(second_optimizer, feed_dict={
              x: noise_x, y: noise_y, keep_prob: 0.5, learning_rate: 0.0002})
-    sess.run(second_optimizer, feed_dict={  
+    sess.run(second_optimizer, feed_dict={
              x: new_noise, y: new_noised, keep_prob: 0.5, learning_rate: 0.0001})
     if step % display_step == 0:
         # Calculate batch accuracy

@@ -158,3 +158,5 @@ while True:
     buf = p[1]
     if buf != 8:
         print('pred: ', buf)
+    ######################
+    #start a thread to send control signals to the drones.

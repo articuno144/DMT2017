@@ -37,6 +37,8 @@ class Drone():
         self.vel = [None, None, None]  # velocity
         self.loc = np.array(self.loc)
         self.vel = np.array(self.vel)
+        # velocity here just mean movement between frames, not actual
+        # velocity
         # location and velocity are stored as np arrays.
         self._cf = Crazyflie()
         self._cf.open_link(link_uri)

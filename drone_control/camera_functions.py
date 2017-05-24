@@ -1,6 +1,7 @@
 import cv2
 import time
 import math
+import numpy as np
 
 
 def get_loc(vc, first_frame=None, cam_num=0, imshow=None):
@@ -30,6 +31,19 @@ def get_angle(x, y, w=640, h=480):
     alpha = math.degrees(math.atan(x*math.tan(math.radians(30))/(w/2)))
     beta = math.degrees(math.atan(y*math.tan(math.radians(25))/(h/2)))
     return alpha, beta
+
+def get_coordinates(tans,a,b,c): #tans ==> array of 6 tangents
+    [ta1,tb1,ta2,tb2,ta3,tb3]=tans   
+    mx1y1=np.array([[1,-ta2],[ta1,1]])#cam1,2
+    [x1,y1]=np.linalg.inv(mx1y1).dot(np.array([-b*ta2,a*ta1]))
+    mx2z1=np.array([[1,ta3],[tb1,1]])#cam1,3
+    [x2,z1]=np.linalg.inv(mx2z1).dot(np.array([c*ta3,a*tb1]))
+    my2z2=np.array([[1,tb3],[tb2,1]])#cam2,3
+    [y2,z2]=np.linalg.inv(my2z2).dot(np.array([c*tb3,b*tb2]))
+    x=0.5*(x1+x2)
+    y=0.5*(y1+y2)
+    z=0.5*(z1+z2)
+    return [x,y,z]
 
 
 if __name__ == '__main__':

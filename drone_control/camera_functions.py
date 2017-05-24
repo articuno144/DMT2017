@@ -2,7 +2,7 @@ import cv2
 import time
 import math
 import numpy as np
-import threading
+from threading import Thread
 
 
 def frame_loc(vc, first_frame=None, cam_num=0, imshow=None):
@@ -49,6 +49,16 @@ def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a, b, c):
     return np.array([x, y, z])
 
 
+def threaded_loop(vc, first_frame, imshow):
+    t = time.time()
+    for i in range(200):
+        x, y = frame_loc(vc, first_frame, 0, "preview")
+        print(x, " ", y)
+        key = cv2.waitKey(10)
+        if key == 27:  # exit on ESC
+            break
+    print(time.time()-t)
+
 if __name__ == '__main__':
     vc = cv2.VideoCapture(0)
     vc.set(3, 640)
@@ -59,16 +69,6 @@ if __name__ == '__main__':
     first_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     first_frame = cv2.GaussianBlur(first_frame, (21, 21), 0)
     # cv2.namedWindow("preview")
-
-    def threaded_loop():
-        t1 = time.time()
-        while(True):
-            x, y = frame_loc(vc, first_frame, 0, "preview")
-            print(x, " ", y)
-            key = cv2.waitKey(10)
-            if key == 27:  # exit on ESC
-                break
-        return time.time()-t1
-    threading.Thread(target=threaded_loop).start()
+    Thread(target=threaded_loop, args=(vc, first_frame, "preview",)).start()
     while 1:
-        pass
+        time.sleep(1)

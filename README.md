@@ -17,4 +17,5 @@ Main work for gesture recognition is done in the folder /CNN/. As the name sugge
 #### Updates
 - update001: downsampling
 - update002: Integrated the tensorflow gesture recognition part with the C# codes through a named pipe
-- update003(ongoing): Gesture Calibration
+- update003: Gesture Calibration
+- update004: Agressive real time gesture training

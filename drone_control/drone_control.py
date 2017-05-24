@@ -21,7 +21,8 @@ def get_loc(vc1, ff1, vc2, ff2, vc3, ff3, a, b, c, loc_prev, vel_prev):
     t1, t2, t3 = cam.get_angle(x1, y1), cam.get_angle(
         x2, y2), cam.get_angle(x3, y3)
     cam_coord = cam.get_coordinates(t1, t2, t3, a, b, c)
-    return 0.7*cam_coord+0.3*(loc_prev+vel_prev)
+    loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
+    return loc_current, (loc_current-loc_prev)
 
 
 class Drone():

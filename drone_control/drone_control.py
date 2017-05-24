@@ -4,20 +4,24 @@ import time
 from threading import Timer
 import numpy as np
 
-# import camera functions
-#################################
+import camera_functions as cam
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.log import LogConfig
 
 
-def get_loc(loc_prev, vel_prev):
+def get_loc(vc1, ff1, vc2, ff2, vc3, ff3, a, b, c, loc_prev, vel_prev):
     """ 
     Return a weighted sum of location from the camera
     and the previous momentum.
     """
-    #################################
-    return
+    x1, y1 = cam.frame_loc(vc1, ff1, 0)
+    x2, y2 = cam.frame_loc(vc2, ff2, 0)
+    x3, y3 = cam.frame_loc(vc3, ff3, 0)
+    t1, t2, t3 = cam.get_angle(x1, y1), cam.get_angle(
+        x2, y2), cam.get_angle(x3, y3)
+    cam_coord = cam.get_coordinates(t1, t2, t3, a, b, c)
+    return 0.7*cam_coord+0.3*(loc_prev+vel_prev)
 
 
 class Drone():
@@ -28,7 +32,6 @@ class Drone():
 
     def __init__(self, link_uri):
         """ Initialises with the specific uri """
-        self.dt = 2**-7
         self.loc = [None, None, None]  # location
         self.vel = [None, None, None]  # velocity
         self.loc = np.array(self.loc)
@@ -55,4 +58,4 @@ class Drone():
         """ Updates the drone location and velocity """
         loc_prev, vel_prev = self.loc, self.vel
         self.loc = get_loc(loc_prev, vel_prev)
-        self.vel = (self.loc - loc_prev) / self.dt
+        self.vel = (self.loc - loc_prev)

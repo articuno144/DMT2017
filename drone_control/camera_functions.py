@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 
-def get_loc(vc, first_frame=None, cam_num=0, imshow=None):
+def frame_loc(vc, first_frame=None, cam_num=0, imshow=None):
     """
     Takes the videoCapture object, first frame and cam_num as the input,
     returns the drone location.
@@ -18,7 +18,7 @@ def get_loc(vc, first_frame=None, cam_num=0, imshow=None):
     x, y, w, h = cv2.boundingRect(thresh)
     if imshow != None:
         cv2.imshow(imshow, frame)
-    return vc, first_frame, x+w/2, y+h/2
+    return x+w/2, y+h/2
 
 
 def get_angle(x, y, w=640, h=480):
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     cv2.namedWindow("preview")
     t1 = time.time()
     for i in range(200):
-        vc, first_frame, x, y = get_loc(vc, first_frame, 0, "preview")
+        x, y = frame_loc(vc, first_frame, 0, "preview")
         print(x, " ", y)
         key = cv2.waitKey(10)
         if key == 27:  # exit on ESC

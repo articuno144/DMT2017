@@ -2,6 +2,7 @@ import cv2
 import time
 import math
 import numpy as np
+import threading
 
 
 def frame_loc(vc, first_frame=None, cam_num=0, imshow=None):
@@ -33,7 +34,8 @@ def get_angle(x, y, w=640, h=480):
     return [ta, tb]
 
 
-def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a, b, c):  # tans ==> array of 6 tangents
+def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a, b, c):
+    # tans ==> array of 6 tangents
     [ta1, tb1], [ta2, tb2], [ta3, tb3] = cam1_tan, cam2_tan, cam3_tan
     mx1y1 = np.array([[1, -ta2], [ta1, 1]])  # cam1,2
     [x1, y1] = np.linalg.inv(mx1y1).dot(np.array([-b*ta2, a*ta1]))
@@ -56,12 +58,17 @@ if __name__ == '__main__':
     rval, frame = vc.read()
     first_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     first_frame = cv2.GaussianBlur(first_frame, (21, 21), 0)
-    cv2.namedWindow("preview")
-    t1 = time.time()
-    for i in range(200):
-        x, y = frame_loc(vc, first_frame, 0, "preview")
-        print(x, " ", y)
-        key = cv2.waitKey(10)
-        if key == 27:  # exit on ESC
-            break
-    print(time.time()-t1)
+    # cv2.namedWindow("preview")
+
+    def threaded_loop():
+        t1 = time.time()
+        while(True):
+            x, y = frame_loc(vc, first_frame, 0, "preview")
+            print(x, " ", y)
+            key = cv2.waitKey(10)
+            if key == 27:  # exit on ESC
+                break
+        return time.time()-t1
+    threading.Thread(target=threaded_loop).start()
+    while 1:
+        pass

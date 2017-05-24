@@ -3,7 +3,7 @@ import time
 import math
 
 
-def get_loc(vc, first_frame=None, cam_num=0, imshow = None):
+def get_loc(vc, first_frame=None, cam_num=0, imshow=None):
     """
     Takes the videoCapture object, first frame and cam_num as the input,
     returns the drone location.
@@ -19,16 +19,16 @@ def get_loc(vc, first_frame=None, cam_num=0, imshow = None):
         cv2.imshow(imshow, frame)
     return vc, first_frame, x+w/2, y+h/2
 
+
 def get_angle(x, y, w=640, h=480):
     """
     From the x,y location read from the camera, get the horizontal angle
     alpha and vertical angle beta.
     """
-    x2 = x-w/2
-    y2 = y-h/2
-    alpha = math.atan(y2/x2)
-    beta = math.atan(x2/y2)
-    ###insert function here
+    x = x-w/2
+    y = y-h/2
+    alpha = math.degrees(math.atan(x*math.tan(math.radians(30))/(w/2)))
+    beta = math.degrees(math.atan(y*math.tan(math.radians(25))/(h/2)))
     return alpha, beta
 
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     vc = cv2.VideoCapture(0)
     vc.set(3, 640)
     vc.set(4, 480)
-    vc.set(16, -6.0)#exposure
+    vc.set(16, -6.0)  # exposure
     assert vc.isOpened(), "can't find camera"
     rval, frame = vc.read()
     first_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     cv2.namedWindow("preview")
     t1 = time.time()
     for i in range(200):
-        vc, first_frame, x, y = get_loc(vc, first_frame, 0,"preview")
+        vc, first_frame, x, y = get_loc(vc, first_frame, 0, "preview")
         print(x, " ", y)
         key = cv2.waitKey(10)
         if key == 27:  # exit on ESC

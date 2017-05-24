@@ -15,7 +15,7 @@ cv2.namedWindow("vc2")
 vc2 = cv2.VideoCapture(1)
 vc2.set(3, 640)
 vc2.set(4, 480)
-vc2.set(6, 10)
+vc2.set(6, 60)
 vc2.set(16, -5.0)#exposure
 if vc2.isOpened():  # try to get the first frame
     rval2, frame2 = vc2.read()

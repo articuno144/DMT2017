@@ -31,6 +31,7 @@ class Drone():
         self.target = np.array([0, 0, 0])
         self.loc_prev = None
         self.vel_prev = None
+        self.not_found_counter = 0
 
     def Initialise(self):
         """ 
@@ -46,10 +47,13 @@ class Drone():
 
     def Go_to(self, target, Commander, Kp=1, Ki=0, Kd=0):
         """ PID controller to get to specific location """
+        if self.not_found_counter > 10:
+            # drone lost
+            Commander.send_setpoint(0, 0, 0, 0)
         #################################
         return
 
-    def get_loc(coordinates, read_failed, loc_prev=None, vel_prev=None):
+    def get_loc(self, coordinates, read_failed, loc_prev=None, vel_prev=None):
         """ 
         Return a weighted sum of location from the camera
         and the previous momentum.
@@ -58,7 +62,9 @@ class Drone():
         if loc_prev == None:
             return cam_coord, np.array([0, 0, 0])
         if read_failed[1]:
+            self.not_found_counter += 1
             return loc_prev+vel_prev
+        self.not_found_counter = 0
         loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
         return loc_current, (loc_current-loc_prev)
 
@@ -80,8 +86,15 @@ def control(target, link_uri):
             # updates the coordinate list from the camera feed
             cam.Cam(coordinates, read_failed, vc0, vc1, vc2,
                     first_frame0, first_frame1, first_frame2)
+            key = cv2.waitKey(10)
+            if key == 27:  # exit on ESC
+                cv2.VideoCapture(1).release()
+                cv2.VideoCapture(2).release()
+                cv2.VideoCapture(3).release()
+                break
             # updates the drone location and velocity
-            cf.loc, cf.vel = cf.get_loc(coordinates, read_failed, cf.loc, cf.vel)
+            cf.loc, cf.vel = cf.get_loc(
+                coordinates, read_failed, cf.loc, cf.vel)
             cf.Go_to(target, cmd)
     if type(link_uri) == list:
         assert len(target) == len(

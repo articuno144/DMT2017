@@ -118,6 +118,8 @@ def Init():
 
 def Cam(coordinates, read_failed, vc0, vc1, vc2,
         first_frame0, first_frame1, first_frame2):
+    # high level function, takes in the coordinates, read_failed list,
+    # VideoCapture objects and their first frames, mutates these lists
     x0, y0 = frame_loc(vc0, first_frame0, imshow0)
     x1, y1 = frame_loc(vc1, first_frame1, imshow1)
     x2, y2 = frame_loc(vc2, first_frame2, imshow2)
@@ -129,12 +131,6 @@ def Cam(coordinates, read_failed, vc0, vc1, vc2,
         read_failed[0] = 0
     else:
         read_failed[0] = 1
-    key = cv2.waitKey(10)
-    if key == 27:  # exit on ESC
-        cv2.VideoCapture(1).release()
-        cv2.VideoCapture(2).release()
-        cv2.VideoCapture(3).release()
-        break
 
 if __name__ == '__main__':
     coordinates = [0, 0, 0]

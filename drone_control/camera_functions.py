@@ -5,7 +5,7 @@ import numpy as np
 from threading import Thread
 
 
-def frame_loc(vc, first_frame=None, imshow=None):
+def frame_loc(vc, first_frame=None, imshow=None, thres=110):
     """
     Takes the videoCapture object, first frame and cam_num as the input,
     returns the drone location.
@@ -14,10 +14,11 @@ def frame_loc(vc, first_frame=None, imshow=None):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (21, 21), 0)
     frameDelta = cv2.absdiff(first_frame, gray)
-    thresh = cv2.threshold(frameDelta, 100, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(frameDelta, thres, 255, cv2.THRESH_BINARY)[1]
     thresh = cv2.dilate(thresh, None, iterations=2)
     x, y, w, h = cv2.boundingRect(thresh)
     if imshow != None:
+        frame=cv2.rectangle(frame,(int(x+w/2-10),int(y+h/2-10)),(int(x+w/2+10),int(y+h/2+10)),(0,0,255),2)
         cv2.imshow(imshow, frame)
     return x+w/2, y+h/2
 
@@ -73,16 +74,21 @@ def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
         print(coordinates+[x0, y0, x1, y1, x2, y2])
         key = cv2.waitKey(10)
         if key == 27:  # exit on ESC
+            cv2.VideoCapture(1).release()
+            cv2.VideoCapture(2).release()
+            cv2.VideoCapture(3).release()
             break
 
 if __name__ == '__main__':
-
+    cv2.VideoCapture(1).release()
+    cv2.VideoCapture(2).release()
+    cv2.VideoCapture(3).release()
     coordinates = [0, 0, 0]
 
     vc0 = cv2.VideoCapture(1)
     vc0.set(3, 640)
     vc0.set(4, 480)
-    vc0.set(16, -5.0)  # exposure
+    vc0.set(15, -7.0)  # exposure
     assert vc0.isOpened(), "can't find camera 0"
     rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
@@ -91,7 +97,7 @@ if __name__ == '__main__':
     vc1 = cv2.VideoCapture(2)
     vc1.set(3, 640)
     vc1.set(4, 480)
-    vc1.set(16, -5.0)  # exposure
+    vc1.set(15, -7.0)  # exposure
     assert vc1.isOpened(), "can't find camera 1"
     rval1, frame1 = vc1.read()
     first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
@@ -100,7 +106,7 @@ if __name__ == '__main__':
     vc2 = cv2.VideoCapture(3)
     vc2.set(3, 640)
     vc2.set(4, 480)
-    vc2.set(16, -5.0)  # exposure
+    vc2.set(15, -7.0)  # exposure
     assert vc2.isOpened(), "can't find camera 2"
     rval2, frame2 = vc2.read()
     first_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)

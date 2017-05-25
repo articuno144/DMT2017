@@ -5,7 +5,7 @@ import numpy as np
 from threading import Thread
 
 
-def frame_loc(vc, first_frame=None, cam_num=0, imshow=None):
+def frame_loc(vc, first_frame=None, imshow=None):
     """
     Takes the videoCapture object, first frame and cam_num as the input,
     returns the drone location.
@@ -34,7 +34,7 @@ def get_angle(x, y, w=640, h=480):
     return [ta, tb]
 
 
-def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a, b, c):
+def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a=1, b=1, c=1):
     # tans ==> array of 6 tangents
     [ta1, tb1], [ta2, tb2], [ta3, tb3] = cam1_tan, cam2_tan, cam3_tan
     mx1y1 = np.array([[1, -ta2], [ta1, 1]])  # cam1,2
@@ -49,26 +49,71 @@ def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a, b, c):
     return np.array([x, y, z])
 
 
-def threaded_loop(vc, first_frame, imshow):
+def threaded_loop_test(vc, first_frame, imshow=None):
     t = time.time()
-    for i in range(200):
-        x, y = frame_loc(vc, first_frame, 0, "preview")
+    while True:
+        x, y = frame_loc(vc, first_frame, imshow)
         print(x, " ", y)
         key = cv2.waitKey(10)
         if key == 27:  # exit on ESC
             break
     print(time.time()-t)
 
+
+def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
+                  first_frame2, imshow0=None,
+                  imshow1=None, imshow2=None):
+    while True:
+        x0, y0 = frame_loc(vc0, first_frame0, imshow0)
+        x1, y1 = frame_loc(vc1, first_frame1, imshow1)
+        x2, y2 = frame_loc(vc2, first_frame2, imshow2)
+
+        coordinates[:] = get_coordinates(
+            get_angle(x0, y0), get_angle(x1, y1), get_angle(x2, y2))[:]
+        print(coordinates+[x0, y0, x1, y1, x2, y2])
+        key = cv2.waitKey(10)
+        if key == 27:  # exit on ESC
+            break
+
 if __name__ == '__main__':
-    vc = cv2.VideoCapture(0)
-    vc.set(3, 640)
-    vc.set(4, 480)
-    vc.set(16, -6.0)  # exposure
-    assert vc.isOpened(), "can't find camera"
-    rval, frame = vc.read()
-    first_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    first_frame = cv2.GaussianBlur(first_frame, (21, 21), 0)
-    # cv2.namedWindow("preview")
-    Thread(target=threaded_loop, args=(vc, first_frame, "preview",)).start()
+
+    coordinates = [0, 0, 0]
+
+    vc0 = cv2.VideoCapture(1)
+    vc0.set(3, 640)
+    vc0.set(4, 480)
+    vc0.set(16, -5.0)  # exposure
+    assert vc0.isOpened(), "can't find camera 0"
+    rval0, frame0 = vc0.read()
+    first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
+    first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)
+
+    vc1 = cv2.VideoCapture(2)
+    vc1.set(3, 640)
+    vc1.set(4, 480)
+    vc1.set(16, -5.0)  # exposure
+    assert vc1.isOpened(), "can't find camera 1"
+    rval1, frame1 = vc1.read()
+    first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+    first_frame1 = cv2.GaussianBlur(first_frame1, (21, 21), 0)
+
+    vc2 = cv2.VideoCapture(3)
+    vc2.set(3, 640)
+    vc2.set(4, 480)
+    vc2.set(16, -5.0)  # exposure
+    assert vc2.isOpened(), "can't find camera 2"
+    rval2, frame2 = vc2.read()
+    first_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+    first_frame2 = cv2.GaussianBlur(first_frame2, (21, 21), 0)
+
+    # Thread(target=threaded_loop_test, args=(vc0, first_frame0, "0",)).start()
+    # Thread(target=threaded_loop_test, args=(vc1, first_frame1, "1",)).start()
+
+    camera_Thread = Thread(target=threaded_loop, args=(coordinates,
+                                                       vc0, vc1, vc2, first_frame0, first_frame1,
+                                                       first_frame2, "0", "1", "2",))
+    camera_Thread.start()
     while 1:
+        # print(coordinates)
         time.sleep(1)
+    # threaded_loop(vc0, vc1, vc2, first_frame0, first_frame1, first_frame2, "0", "1", "2",)

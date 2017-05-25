@@ -51,9 +51,10 @@ class Drone():
         location and velocity.
         """
         cflib.crtp.init_drivers(enable_debug_driver=False)
-        #move the line above to main function for multi drones
+        self._cf.open_link(self.uri)
+        # move the line above to main function for multi drones
         self.cmd = cflib.crazyflie.Commander(self._cf)
-        self.cmf.send_setpoint(0,0,0,0)
+        self.cmd.send_setpoint(0, 0, 0, 0)
         return self.cmd
 
     def Go_to(self, target, Kp, Ki, Kd):

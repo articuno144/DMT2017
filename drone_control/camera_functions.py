@@ -28,7 +28,7 @@ def get_angle(x, y, w=640, h=480):
     horizontal angle alpha and vertical angle beta.
     """
     x = x-w/2
-    y = y-h/2
+    y = h/2-y
     ta = x*math.tan(math.radians(30))/(w/2)
     tb = y*math.tan(math.radians(25))/(h/2)
     return [ta, tb]

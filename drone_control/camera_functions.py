@@ -81,15 +81,12 @@ def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
             break
 
 
-def Cam(coordinates, vc0, vc1, vc2, first_frame0, first_frame1, first_frame2):
-    pass
-
-if __name__ == '__main__':
+def Init():
     cv2.VideoCapture(1).release()
     cv2.VideoCapture(2).release()
     cv2.VideoCapture(3).release()
-    coordinates = [0, 0, 0]
 
+    # Cam 0
     vc0 = cv2.VideoCapture(1)
     vc0.set(3, 640)
     vc0.set(4, 240)
@@ -98,7 +95,7 @@ if __name__ == '__main__':
     rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
     first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)
-
+    # Cam 1
     vc1 = cv2.VideoCapture(2)
     vc1.set(3, 640)
     vc1.set(4, 240)
@@ -107,7 +104,7 @@ if __name__ == '__main__':
     rval1, frame1 = vc1.read()
     first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
     first_frame1 = cv2.GaussianBlur(first_frame1, (21, 21), 0)
-
+    # Cam 2
     vc2 = cv2.VideoCapture(3)
     vc2.set(3, 640)
     vc2.set(4, 240)
@@ -116,6 +113,32 @@ if __name__ == '__main__':
     rval2, frame2 = vc2.read()
     first_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
     first_frame2 = cv2.GaussianBlur(first_frame2, (21, 21), 0)
+    return vc0, vc1, vc2, first_frame0, first_frame1, first_frame2
+
+
+def Cam(coordinates, read_failed, vc0, vc1, vc2,
+        first_frame0, first_frame1, first_frame2):
+    x0, y0 = frame_loc(vc0, first_frame0, imshow0)
+    x1, y1 = frame_loc(vc1, first_frame1, imshow1)
+    x2, y2 = frame_loc(vc2, first_frame2, imshow2)
+
+    coordinates[:] = get_coordinates(
+        get_angle(x0, y0), get_angle(x1, y1), get_angle(x2, y2))[:]
+    print(coordinates+[x0, y0, x1, y1, x2, y2])
+    if x0*x1*x2 != 0 or y0*y1*y2 != 0:  # captured by all 3 cams
+        read_failed[0] = 0
+    else:
+        read_failed[0] = 1
+    key = cv2.waitKey(10)
+    if key == 27:  # exit on ESC
+        cv2.VideoCapture(1).release()
+        cv2.VideoCapture(2).release()
+        cv2.VideoCapture(3).release()
+        break
+
+if __name__ == '__main__':
+    coordinates = [0, 0, 0]
+    vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = Init()
 
     # Thread(target=threaded_loop_test, args=(vc0, first_frame0, "0",)).start()
     # Thread(target=threaded_loop_test, args=(vc1, first_frame1, "1",)).start()

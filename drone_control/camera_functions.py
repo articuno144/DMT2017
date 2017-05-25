@@ -18,7 +18,8 @@ def frame_loc(vc, first_frame=None, imshow=None, thres=110):
     thresh = cv2.dilate(thresh, None, iterations=2)
     x, y, w, h = cv2.boundingRect(thresh)
     if imshow != None:
-        frame=cv2.rectangle(frame,(int(x+w/2-10),int(y+h/2-10)),(int(x+w/2+10),int(y+h/2+10)),(0,0,255),2)
+        frame = cv2.rectangle(frame, (int(x+w/2-10), int(y+h/2-10)),
+                              (int(x+w/2+10), int(y+h/2+10)), (0, 0, 255), 2)
         cv2.imshow(imshow, frame)
     return x+w/2, y+h/2
 
@@ -52,7 +53,7 @@ def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a=1, b=1, c=1):
 
 def threaded_loop_test(vc, first_frame, imshow=None):
     t = time.time()
-    while True:
+    for i in range(1000):
         x, y = frame_loc(vc, first_frame, imshow)
         print(x, " ", y)
         key = cv2.waitKey(10)
@@ -79,6 +80,10 @@ def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
             cv2.VideoCapture(3).release()
             break
 
+
+def Cam(coordinates, vc0, vc1, vc2, first_frame0, first_frame1, first_frame2):
+    pass
+
 if __name__ == '__main__':
     cv2.VideoCapture(1).release()
     cv2.VideoCapture(2).release()
@@ -87,8 +92,8 @@ if __name__ == '__main__':
 
     vc0 = cv2.VideoCapture(1)
     vc0.set(3, 640)
-    vc0.set(4, 480)
-    vc0.set(15, -7.0)  # exposure
+    vc0.set(4, 240)
+    vc0.set(15, -6)  # exposure
     assert vc0.isOpened(), "can't find camera 0"
     rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
@@ -96,8 +101,8 @@ if __name__ == '__main__':
 
     vc1 = cv2.VideoCapture(2)
     vc1.set(3, 640)
-    vc1.set(4, 480)
-    vc1.set(15, -7.0)  # exposure
+    vc1.set(4, 240)
+    vc1.set(15, -6)  # exposure
     assert vc1.isOpened(), "can't find camera 1"
     rval1, frame1 = vc1.read()
     first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
@@ -105,8 +110,8 @@ if __name__ == '__main__':
 
     vc2 = cv2.VideoCapture(3)
     vc2.set(3, 640)
-    vc2.set(4, 480)
-    vc2.set(15, -7.0)  # exposure
+    vc2.set(4, 240)
+    vc2.set(15, -6)  # exposure
     assert vc2.isOpened(), "can't find camera 2"
     rval2, frame2 = vc2.read()
     first_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
@@ -115,9 +120,10 @@ if __name__ == '__main__':
     # Thread(target=threaded_loop_test, args=(vc0, first_frame0, "0",)).start()
     # Thread(target=threaded_loop_test, args=(vc1, first_frame1, "1",)).start()
 
-    camera_Thread = Thread(target=threaded_loop, args=(coordinates,
-                                                       vc0, vc1, vc2, first_frame0, first_frame1,
-                                                       first_frame2, "0", "1", "2",))
+    camera_Thread = Thread(
+        target=threaded_loop, args=(coordinates,
+                                    vc0, vc1, vc2, first_frame0, first_frame1,
+                                    first_frame2, "0", "1", "2",))
     camera_Thread.start()
     while 1:
         # print(coordinates)

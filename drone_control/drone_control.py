@@ -67,3 +67,40 @@ class Drone():
         loc_prev, vel_prev = self.loc, self.vel
         self.loc = get_loc(loc_prev, vel_prev)
         self.vel = (self.loc - loc_prev)
+
+
+def control(target, link_uri, gesture1=False, gesture2=False, gesture3=False):
+    if len(link_uri) > 1:
+        assert len(target) == len(
+            link_uri), "Provide exactly one link_uri for each target location"
+    if len(link_uri) == 1:
+        # Initialise
+        coordinates = [0, 0, 0]
+        # Cam 0
+        vc0 = cv2.VideoCapture(1)
+        vc0.set(3, 640)
+        vc0.set(4, 480)
+        vc0.set(15, -7.0)  # exposure
+        assert vc0.isOpened(), "can't find camera 0"
+        rval0, frame0 = vc0.read()
+        first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
+        first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)
+        # Cam 1
+        vc1 = cv2.VideoCapture(2)
+        vc1.set(3, 640)
+        vc1.set(4, 480)
+        vc1.set(15, -7.0)  # exposure
+        assert vc1.isOpened(), "can't find camera 1"
+        rval1, frame1 = vc1.read()
+        first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+        first_frame1 = cv2.GaussianBlur(first_frame1, (21, 21), 0)
+        # Cam 2
+        vc2 = cv2.VideoCapture(3)
+        vc2.set(3, 640)
+        vc2.set(4, 480)
+        vc2.set(15, -7.0)  # exposure
+        assert vc2.isOpened(), "can't find camera 2"
+        rval2, frame2 = vc2.read()
+        first_frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+        first_frame2 = cv2.GaussianBlur(first_frame2, (21, 21), 0)
+

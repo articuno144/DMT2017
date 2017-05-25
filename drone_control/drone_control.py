@@ -5,6 +5,7 @@ from threading import Timer
 import numpy as np
 
 import camera_functions as cam
+import cflib
 import cflib.crtp
 from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.log import LogConfig
@@ -41,7 +42,7 @@ class Drone():
         # velocity
         # location and velocity are stored as np arrays.
         self._cf = Crazyflie()
-        self._cf.open_link(link_uri)
+        self.uri = link_uri
         self.target = np.array([0, 0, 0])
 
     def Initialise(self):
@@ -49,8 +50,11 @@ class Drone():
         Connect with the drone by the link uri, get initial
         location and velocity.
         """
-        #################################
-        return
+        cflib.crtp.init_drivers(enable_debug_driver=False)
+        #move the line above to main function for multi drones
+        self.cmd = cflib.crazyflie.Commander(self._cf)
+        self.cmf.send_setpoint(0,0,0,0)
+        return self.cmd
 
     def Go_to(self, target, Kp, Ki, Kd):
         """ PID controller to get to specific location """

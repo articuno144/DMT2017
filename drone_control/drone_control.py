@@ -45,13 +45,21 @@ class Drone():
         self.cmd.send_setpoint(0, 0, 0, 0)
         return self.cmd
 
-    def Go_to(self, target, Commander, Kp=1, Ki=0, Kd=0):
+    def Go_to(self, target, Commander, Kp=10, Ki=-5, Kd=0):
         """ PID controller to get to specific location """
         if self.not_found_counter > 10:
             # drone lost
             Commander.send_setpoint(0, 0, 0, 0)
-        #################################
+        else:
+            command = (target - self.loc) * Kp + self.vel * Kp
+            pitch = min(max(command[0], -10), 10)
+            roll = - min(max(command[1], -10), 10)
+            thrust = - min(max(command[3], 10500), 35000)
+            self.cmd.send_setpoint(roll, pitch, 0, thrust)
         return
+
+    def Start_up(self):
+        self.cmd.send_setpoint(0,0,0,40000)
 
     def get_loc(self, coordinates, read_failed, loc_prev=None, vel_prev=None):
         """ 
@@ -77,11 +85,13 @@ def control(target, link_uri):
     """
     if type(link_uri) == str:
         coordinates = [0, 0, 0]
-        read_failed = [0]
+        read_failed = [1]
         # Initialise
         vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = cam.Init()
         cf = Drone("radio://0/80/250K")
         cmd = cf.Initialise()
+        input("press enter when ready")
+        cf.Start_up()
         while True:
             # updates the coordinate list from the camera feed
             cam.Cam(coordinates, read_failed, vc0, vc1, vc2,

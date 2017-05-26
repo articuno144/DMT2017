@@ -1,13 +1,14 @@
 import cv2
 
 cv2.namedWindow("vc1")
-vc1 = cv2.VideoCapture(0)
+vc1 = cv2.VideoCapture(3)
 vc1.set(3, 640)
 vc1.set(4, 240)
 vc1.set(6, 60)
 vc1.set(15,-6)
 if vc1.isOpened():  # try to get the first frame
-    rval1, frame1 = vc1.read()
+    for i in range(5):
+        rval1, frame1 = vc1.read()
     firstframe1 = None
 else:
     rval1 = False
@@ -28,10 +29,11 @@ else:
 def get_loc(firstframe, gray,frame):
     # print the location of the darkest k regions frame 480*640*3
     frameDelta = cv2.absdiff(firstframe, gray)
-    thresh = cv2.threshold(frameDelta, 100, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(frameDelta, 40, 255, cv2.THRESH_BINARY)[1]
     thresh = cv2.dilate(thresh, None, iterations=2)
     x, y, w, h = cv2.boundingRect(thresh)
-    frame=cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),2)
+    frame=cv2.rectangle(frame,(319,200),(321,280),(0,0,255),2)
+    #frame=cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),2)
     cv2.imshow("frame", frame)
     cv2.imshow("Thresh", thresh)
     cv2.imshow("frame2", frameDelta)

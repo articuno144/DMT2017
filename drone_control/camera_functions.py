@@ -81,9 +81,7 @@ def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
             break
 
 
-def simplified_loop():
-    coordinates = [0,0,0]
-    read_failed = [0]
+def simplified_loop(coordinates,read_failed):
     vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = Init()
     while True:
         Cam(coordinates, read_failed, vc0, vc1, vc2,
@@ -107,7 +105,7 @@ def Init():
     vc0.set(4, 240)
     vc0.set(15, -7.2)  # exposure
     assert vc0.isOpened(), "can't find camera 0"
-    for i in range(5):
+    for i in range(6):
         rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
     first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)
@@ -143,21 +141,23 @@ def Cam(coordinates, read_failed, vc0, vc1, vc2,
         imshow0, imshow1, imshow2 = "cam x", "cam y", "cam z"
     else:
         imshow0 = imshow1 = imshow2 = None
-    x0, y0 = frame_loc(vc0, first_frame0, imshow0, 60)
-    x1, y1 = frame_loc(vc1, first_frame1, imshow1, 50)
-    x2, y2 = frame_loc(vc2, first_frame2, imshow2, 60)
+    x0, y0 = frame_loc(vc0, first_frame0, imshow0, 30)
+    x1, y1 = frame_loc(vc1, first_frame1, imshow1, 40)
+    x2, y2 = frame_loc(vc2, first_frame2, imshow2, 40)
 
     coordinates[:] = get_coordinates(
         get_angle(x0, y0), get_angle(x1, y1), get_angle(x2, y2))[:]
-    print(coordinates+[x0, y0, x1, y1, x2, y2])
+    print([x0, y0, x1, y1, x2, y2])
     if x0*x1*x2 != 0 or y0*y1*y2 != 0:  # captured by all 3 cams
         read_failed[0] = 0
+        print("found drone")
     else:
         read_failed[0] = 1
 
 if __name__ == '__main__':
     coordinates = [0, 0, 0]
-    vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = Init()
+    read_failed = [1]
+    # vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = Init()
 
     # Thread(target=threaded_loop_test, args=(vc0, first_frame0, "0",)).start()
     # Thread(target=threaded_loop_test, args=(vc1, first_frame1, "1",)).start()
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     #     target=threaded_loop, args=(coordinates,
     #                                 vc0, vc1, vc2, first_frame0, first_frame1,
     #                                 first_frame2, "0", "1", "2",))
-    camera_Thread = Thread(target=simplified_loop, args=())
+    camera_Thread = Thread(target=simplified_loop, args=(coordinates, read_failed))
     camera_Thread.start()
     while 1:
         # print(coordinates)

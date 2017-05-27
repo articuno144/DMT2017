@@ -18,7 +18,7 @@ def frame_loc(vc, first_frame=None, imshow=None, thres=60):
     thresh = cv2.dilate(thresh, None, iterations=2)
     x, y, w, h = cv2.boundingRect(thresh)
     if imshow != None:
-        frame = cv2.rectangle(frame, (int(x+w/2-10), int(y+h/2-10)),
+        frame = cv2.rectangle(frameDelta, (int(x+w/2-10), int(y+h/2-10)),
                               (int(x+w/2+10), int(y+h/2+10)), (0, 0, 255), 2)
         cv2.imshow(imshow, frame)
     return x+w/2, y+h/2
@@ -36,7 +36,7 @@ def get_angle(x, y, w=640, h=480):
     return [ta, tb]
 
 
-def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a=1, b=1, c=1):
+def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a=0.815, b=0.815, c=0.815):
     # tans ==> array of 6 tangents
     [ta1, tb1], [ta2, tb2], [ta3, tb3] = cam1_tan, cam2_tan, cam3_tan
     mx1y1 = np.array([[1, -ta2], [ta1, 1]])  # cam1,2
@@ -66,13 +66,28 @@ def threaded_loop(coordinates, vc0, vc1, vc2, first_frame0, first_frame1,
                   first_frame2, imshow0=None,
                   imshow1=None, imshow2=None):
     while True:
-        x0, y0 = frame_loc(vc0, first_frame0, imshow0,60)
-        x1, y1 = frame_loc(vc1, first_frame1, imshow1,50)
-        x2, y2 = frame_loc(vc2, first_frame2, imshow2,60)
+        x0, y0 = frame_loc(vc0, first_frame0, imshow0, 60)
+        x1, y1 = frame_loc(vc1, first_frame1, imshow1, 50)
+        x2, y2 = frame_loc(vc2, first_frame2, imshow2, 60)
 
         coordinates[:] = get_coordinates(
             get_angle(x0, y0), get_angle(x1, y1), get_angle(x2, y2))[:]
         print(coordinates+[x0, y0, x1, y1, x2, y2])
+        key = cv2.waitKey(10)
+        if key == 27:  # exit on ESC
+            cv2.VideoCapture(1).release()
+            cv2.VideoCapture(2).release()
+            cv2.VideoCapture(3).release()
+            break
+
+
+def simplified_loop():
+    coordinates = [0,0,0]
+    read_failed = [0]
+    vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = Init()
+    while True:
+        Cam(coordinates, read_failed, vc0, vc1, vc2,
+            first_frame0, first_frame1, first_frame2)
         key = cv2.waitKey(10)
         if key == 27:  # exit on ESC
             cv2.VideoCapture(1).release()
@@ -90,9 +105,9 @@ def Init():
     vc0 = cv2.VideoCapture(1)
     vc0.set(3, 640)
     vc0.set(4, 240)
-    vc0.set(15, -7)  # exposure
+    vc0.set(15, -7.2)  # exposure
     assert vc0.isOpened(), "can't find camera 0"
-    for i in range(3):
+    for i in range(5):
         rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
     first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)
@@ -100,9 +115,9 @@ def Init():
     vc1 = cv2.VideoCapture(2)
     vc1.set(3, 640)
     vc1.set(4, 240)
-    vc1.set(15, -7)  # exposure
+    vc1.set(15, -7.2)  # exposure
     assert vc1.isOpened(), "can't find camera 1"
-    for i in range(3):
+    for i in range(5):
         rval1, frame1 = vc1.read()
     first_frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
     first_frame1 = cv2.GaussianBlur(first_frame1, (21, 21), 0)
@@ -120,12 +135,17 @@ def Init():
 
 
 def Cam(coordinates, read_failed, vc0, vc1, vc2,
-        first_frame0, first_frame1, first_frame2):
+        first_frame0, first_frame1, first_frame2,
+        testing=True):
     # high level function, takes in the coordinates, read_failed list,
     # VideoCapture objects and their first frames, mutates these lists
-    x0, y0 = frame_loc(vc0, first_frame0, imshow0)
-    x1, y1 = frame_loc(vc1, first_frame1, imshow1)
-    x2, y2 = frame_loc(vc2, first_frame2, imshow2)
+    if testing:
+        imshow0, imshow1, imshow2 = "cam x", "cam y", "cam z"
+    else:
+        imshow0 = imshow1 = imshow2 = None
+    x0, y0 = frame_loc(vc0, first_frame0, imshow0, 60)
+    x1, y1 = frame_loc(vc1, first_frame1, imshow1, 50)
+    x2, y2 = frame_loc(vc2, first_frame2, imshow2, 60)
 
     coordinates[:] = get_coordinates(
         get_angle(x0, y0), get_angle(x1, y1), get_angle(x2, y2))[:]
@@ -142,10 +162,11 @@ if __name__ == '__main__':
     # Thread(target=threaded_loop_test, args=(vc0, first_frame0, "0",)).start()
     # Thread(target=threaded_loop_test, args=(vc1, first_frame1, "1",)).start()
 
-    camera_Thread = Thread(
-        target=threaded_loop, args=(coordinates,
-                                    vc0, vc1, vc2, first_frame0, first_frame1,
-                                    first_frame2, "0", "1", "2",))
+    # camera_Thread = Thread(
+    #     target=threaded_loop, args=(coordinates,
+    #                                 vc0, vc1, vc2, first_frame0, first_frame1,
+    #                                 first_frame2, "0", "1", "2",))
+    camera_Thread = Thread(target=simplified_loop, args=())
     camera_Thread.start()
     while 1:
         # print(coordinates)

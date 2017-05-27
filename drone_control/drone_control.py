@@ -3,6 +3,7 @@ import logging
 import time
 from threading import Timer
 import numpy as np
+import cv2
 
 import camera_functions as cam
 import cflib
@@ -54,28 +55,31 @@ class Drone():
             command = (target - self.loc) * Kp + self.vel * Kp
             pitch = min(max(command[0], -10), 10)
             roll = - min(max(command[1], -10), 10)
-            thrust = - min(max(command[3], 10500), 35000)
+            thrust = - min(max(command[3], 10500), 40000)
             self.cmd.send_setpoint(roll, pitch, 0, thrust)
         return
 
-    def Start_up(self):
-        self.cmd.send_setpoint(0,0,0,40000)
+    def Start_up(self, thrust):
+        self.cmd.send_setpoint(0, 0, 0, thrust)
 
+    # def get_loc(self, coordinates, read_failed, loc_prev=None, vel_prev=None):
+    #     """ 
+    #     Return a weighted sum of location from the camera
+    #     and the previous momentum.
+    #     """
+    #     cam_coord = np.array(coordinates)
+    #     if loc_prev == None:
+    #         return cam_coord, np.array([0, 0, 0])
+    #     if read_failed[0]==1:
+    #         self.not_found_counter += 1
+    #         return loc_prev+vel_prev
+    #     self.not_found_counter = 0
+    #     loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
+    #     return loc_current, (loc_current-loc_prev)
     def get_loc(self, coordinates, read_failed, loc_prev=None, vel_prev=None):
-        """ 
-        Return a weighted sum of location from the camera
-        and the previous momentum.
-        """
-        cam_coord = np.array(coordinates)
-        if loc_prev == None:
-            return cam_coord, np.array([0, 0, 0])
-        if read_failed[1]:
-            self.not_found_counter += 1
-            return loc_prev+vel_prev
-        self.not_found_counter = 0
-        loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
-        return loc_current, (loc_current-loc_prev)
-
+        if read_failed[0]==1:
+            return self.loc
+        return np.array(coordinates)
 
 def control(target, link_uri):
     """
@@ -88,10 +92,23 @@ def control(target, link_uri):
         read_failed = [1]
         # Initialise
         vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = cam.Init()
-        cf = Drone("radio://0/80/250K")
+        cf = Drone(link_uri)
         cmd = cf.Initialise()
         input("press enter when ready")
-        cf.Start_up()
+        cf.Start_up(35000)
+        while True:
+            cam.Cam(coordinates, read_failed, vc0, vc1, vc2,
+                    first_frame0, first_frame1, first_frame2)
+            if read_failed[0]==0:
+                print("drone found")
+                cmd.send_setpoint(0,0,0,0)
+                break
+            key = cv2.waitKey(10)
+            if key == 27:  # exit on ESC
+                cv2.VideoCapture(1).release()
+                cv2.VideoCapture(2).release()
+                cv2.VideoCapture(3).release()
+                break
         while True:
             # updates the coordinate list from the camera feed
             cam.Cam(coordinates, read_failed, vc0, vc1, vc2,
@@ -109,3 +126,6 @@ def control(target, link_uri):
     if type(link_uri) == list:
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"
+
+if __name__ == '__main__':
+    control(np.array([0, 0, 0]), "radio://0/80/250K")

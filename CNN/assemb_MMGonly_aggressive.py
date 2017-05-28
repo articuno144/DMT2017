@@ -18,6 +18,8 @@ ready = 0
 new_noise = None
 training_set = None
 
+roll, pitch, yaw = None, None, None
+
 weights = {
     'wc3': tf.Variable(tf.random_normal([3, 3, 1, 32])),
     # 5x5 conv, 32 inputs, 64 outputs
@@ -84,8 +86,11 @@ while True:
     c += 1
     # ctr+=1
     s = list(s)
+    roll = (s[9]-100)*10/3.14
+    pitch = (s[10]-100)*10/3.14
+    print(roll, pitch)
     m[0, :49, :] = m[0, 1:, :]
-    m[0, 49, :] = standardize(s[3:])
+    m[0, 49, :] = standardize(s[3:9])
     if s[0] == 0 and r_prev == 1:
         g, t = s[1]-1, s[2]-1
         if training_set == None:
@@ -104,7 +109,7 @@ while True:
         cal = np.zeros(9)
         cal[s[1]] = 1
         cali_d = np.concatenate((cali_d, cal.reshape(1, 9)), axis=0)
-    if s[0] == 0:    
+    if s[0] == 0:
         if new_noise == None and c > 5 and c < 90:
             new_noise = np.array(m)
             new_noised = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1])
@@ -159,8 +164,10 @@ while step * batch_size < training_iters:
 while True:
     # ctr+=1
     s = list(s)
+    roll = (s[9]-100)*10/3.14
+    pitch = (s[10]-100)*10/3.14
     m[0, :49, :] = m[0, 1:, :]
-    m[0, 49, :] = standardize(s[3:])
+    m[0, 49, :] = standardize(s[3:9])
     p = process(sess, m)
     p = bytes(p)
     f.write(struct.pack('I', len(p)) + p)   # Write str length and str

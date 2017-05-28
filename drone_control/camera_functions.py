@@ -105,7 +105,7 @@ def Init():
     vc0.set(4, 240)
     vc0.set(15, -7.2)  # exposure
     assert vc0.isOpened(), "can't find camera 0"
-    for i in range(6):
+    for i in range(16):
         rval0, frame0 = vc0.read()
     first_frame0 = cv2.cvtColor(frame0, cv2.COLOR_BGR2GRAY)
     first_frame0 = cv2.GaussianBlur(first_frame0, (21, 21), 0)

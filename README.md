@@ -14,7 +14,7 @@ This project aims to create a human machine interface (HRI) for drone control. S
 ### Gesture Recognition
 Main work for gesture recognition is in the folder /CNN/. As the name suggests, gestures are recognized with a convolutional neural network. We used 2 convolutional layers for both accelerometer and MMG (mechanomyogram) data, and added two fully connected layers after that. From experiments, different users could have drastically distinct muscle signal outputs for the same gesture. Hence the neural network needs to be tuned for each user. The network weights are pre-trained with signals from 23 participants, and the actual users would be requested to record 5 signal samples for each gesture to be recognized to further tune the two fully connected layers (takes about 20 seconds to tune).
 
-![CNN_structure](C:\DMT2017\photos\CNN_structure.png)
+![CNN_structure](https://github.com/articuno144/DMT2017/blob/master/photos/CNN_structure.png)
 
 <!--insert the confusion matrix for gesture recognition accuracy-->
 
@@ -24,9 +24,9 @@ This project is intended to allow the control of a drone swarm with the armband.
 
 <!--insert camera set up and screen shots-->
 
-![coord_1](C:\DMT2017\photos\coord_1.png)
+![coord_1](https://github.com/articuno144/DMT2017/blob/master/photos/coord_1.png)
 
-![coord_2](C:\DMT2017\photos\coord_2.png)
+![coord_2](https://github.com/articuno144/DMT2017/blob/master/photos/coord_2.png)
 
 ### PID control for the drones
 

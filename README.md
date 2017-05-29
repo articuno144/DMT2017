@@ -36,6 +36,6 @@ The controller takes in the desired location, and calculates the error in locati
 
 <!--insert close loop digram here-->
 
-The video below illustrates the location control working with the drone locating system.
+[This video](https://www.youtube.com/watch?v=IBKpXXAWtTo&feature=youtu.be) illustrates the location control working with the drone locating system.
 
-https://www.youtube.com/watch?v=IBKpXXAWtTo&feature=youtu.be
+

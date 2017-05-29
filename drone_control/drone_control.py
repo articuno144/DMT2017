@@ -81,55 +81,7 @@ class Drone():
         loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
         return loc_current, (loc_current-loc_prev)
 
-
-def control(target, link_uri):
-    """
-    The main control function, to be called as a separate thread from the gesture
-    recognition part. This function continuously reads the targets and attemps to
-    move the drone to the target.
-    """
-    if type(link_uri) == str:
-        coordinates = [0, 0, 0]
-        read_failed = [1]
-        # Initialise
-        vc0, vc1, vc2, first_frame0, first_frame1, first_frame2 = cam.Init()
-        cf = Drone(link_uri)
-        cmd = cf.Initialise()
-        input("press enter when ready")
-        cf.Start_up(40000)
-        while True:
-            cam.Cam(coordinates, read_failed, vc0, vc1, vc2,
-                    first_frame0, first_frame1, first_frame2)
-            if read_failed[0] == 0:
-                print("drone found")
-                cmd.send_setpoint(0, 0, 0, 0)
-                break
-            key = cv2.waitKey(10)
-            if key == 27:  # exit on ESC
-                cv2.VideoCapture(1).release()
-                cv2.VideoCapture(2).release()
-                cv2.VideoCapture(3).release()
-                break
-        while True:
-            # updates the coordinate list from the camera feed
-            cam.Cam(coordinates, read_failed, vc0, vc1, vc2,
-                    first_frame0, first_frame1, first_frame2)
-            key = cv2.waitKey(10)
-            if key == 27:  # exit on ESC
-                cv2.VideoCapture(1).release()
-                cv2.VideoCapture(2).release()
-                cv2.VideoCapture(3).release()
-                break
-            # updates the drone location and velocity
-            cf.loc, cf.vel = cf.get_loc(
-                coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
-            cf.Go_to(target, cmd)
-    if type(link_uri) == list:
-        assert len(target) == len(
-            link_uri), "Provide exactly one link_uri for each target location"
-
-
-def simplified_control(target, link_uri):
+def simplified_control(target, link_uri, start_signal):
     """
     The main control function, to be called as a separate thread from the gesture
     recognition part. This function continuously reads the targets and attemps to
@@ -163,5 +115,40 @@ def simplified_control(target, link_uri):
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"
 
+def control(target, link_uri, start_signal):
+    """
+    The main control function, to be called as a separate thread from the gesture
+    recognition part. This function continuously reads the targets and attemps to
+    move the drone to the target.
+    """
+    if type(link_uri) == str:
+        coordinates = [0, 0, 0]
+        read_failed = [1]
+        # Initialise
+        camera_Thread = Thread(target=cam.simplified_loop,
+                               args=(coordinates, read_failed))
+        camera_Thread.start()
+        cf = Drone(link_uri)
+        cmd = cf.Initialise()
+        while start_signal[0]==0:
+            time.sleep(0.1)
+        cf.Start_up(37500)
+        while True:
+            time.sleep(0.01)
+            if read_failed[0] == 0:
+                print("drone found")
+                cmd.send_setpoint(0, 0, 0, 0)
+                break
+        while True:
+            # updates the coordinate list from the camera feed
+            # updates the drone location and velocity
+            cf.loc, cf.vel = cf.get_loc(
+                coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
+            cf.Go_to(target, cmd)
+            time.sleep(0.01)
+    if type(link_uri) == list:
+        assert len(target) == len(
+            link_uri), "Provide exactly one link_uri for each target location"
+
 if __name__ == '__main__':
-    simplified_control(np.array([0, 0, 0]), "radio://0/80/250K")
+    simplified_control(np.array([0, 0, 0]), "radio://0/80/250K",[0])

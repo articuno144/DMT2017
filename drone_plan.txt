@@ -1,7 +1,0 @@
-each drone as a drone class object.
-
--   use camera to read drone.x, drone.y, drone.z
-
--   use drone log callback (examples in basiclog.py) to update drone.r, drone.p, drone.y
-
--   control loop (PID)

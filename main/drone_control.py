@@ -139,13 +139,16 @@ def control(target, link_uri, start_signal):
                 print("drone found")
                 cmd.send_setpoint(0, 0, 0, 0)
                 break
-        while True:
+        while start_signal[0]==1:
             # updates the coordinate list from the camera feed
             # updates the drone location and velocity
             cf.loc, cf.vel = cf.get_loc(
                 coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
             cf.Go_to(target, cmd)
             time.sleep(0.01)
+        for i in range(5):
+            cmd.send_setpoint(0,0,0,20000)
+            time.sleep(0.5)
     if type(link_uri) == list:
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"

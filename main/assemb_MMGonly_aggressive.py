@@ -164,14 +164,15 @@ while step * batch_size < training_iters:
               "{:.6f}".format(acc))
     step += 1
 
-target = [0,0,-0.1]
+target = [0, 0, -0.1]
 start_signal = [0]
 target_locked = True
 control_Thread = Thread(target=dc.control,
-                       args=(target, "radio://0/80/250K", start_signal))
+                        args=(target, "radio://0/80/250K", start_signal))
 control_Thread.start()
+new_gesture_counter = 0
 
-gesture_window = [8,8,8,8,8,8,8,8]
+gesture_window = [8, 8, 8, 8, 8, 8, 8, 8]
 while True:
     # ctr+=1
     s = list(s)
@@ -189,20 +190,27 @@ while True:
     f.seek(0)                               # Important!!!
     gesture_window[:7] = gesture_window[1:]
     gesture_window[7] = p[1]
-    if gesture_window[6]==8 and gesture_window[7]==8 and gesture_window[5]!=8:
-        if gesture_window[3]==0:
-            target[2] = 0 - target[2]
-        elif gesture_window[3]==1:
-            target_locked = not target_locked
-        elif gesture_window[3]==2:
-            if start_signal[0]==0:
-                start_signal[0]=1
-            else:
-                ####land drone
-                print("drone landing")
+    if new_gesture_counter > 0:
+        new_gesture_counter += 1
+    if new_gesture_counter > 5:
+        new_gesture_counter = 0
+    if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
+        if new_gesture_counter == 0:
+            new_gesture_counter += 1
+            if gesture_window[3] == 0:
+                target[2] = 0 - target[2]
+            elif gesture_window[3] == 1:
+                target_locked = not target_locked
+            elif gesture_window[3] == 2:
+                if start_signal[0] == 0:
+                    start_signal[0] = 1
+                else:
+                    print("drone landing")
+                    break
 
     buf = p[1]
     if buf != 8:
         print('pred: ', buf)
     if not target_locked:
-        ###change target according to roll and pitch, cap applied
+        target[0] = min(max(target[0]+pitch/100,-0.2),0.2)
+        target[1] = min(max(target[1]+roll/100,-0.2),0.2)

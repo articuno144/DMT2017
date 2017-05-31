@@ -81,6 +81,7 @@ class Drone():
         loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
         return loc_current, (loc_current-loc_prev)
 
+
 def simplified_control(target, link_uri):
     """
     The main control function, to be called as a separate thread from the gesture
@@ -90,6 +91,7 @@ def simplified_control(target, link_uri):
     if type(link_uri) == str:
         coordinates = [0, 0, 0]
         read_failed = [1]
+        start_signal = [0]
         # Initialise
         camera_Thread = Thread(target=cam.simplified_loop,
                                args=(coordinates, read_failed))
@@ -114,6 +116,52 @@ def simplified_control(target, link_uri):
     if type(link_uri) == list:
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"
+        coordinates = [[0, 0, 0], [0, 0, 0]]
+        read_failed0 = [1]
+        read_failed1 = [1]
+        start_signal = [0]
+        read_failed = [read_failed0, read_failed1]
+        # Initialise
+        camera_Thread = Thread(target=cam.simplified_loop,
+                               args=(coordinates, read_failed))
+        camera_Thread.start()
+        cf0 = Drone(link_uri[0])
+        cf1 = Drone(link_uri[1])
+        cmd0 = cf0.Initialise()
+        cmd1 = cf1.Initialise()
+        input("press enter when ready")
+        cf0_Thread = Thread(target=individual_control, args=(
+            target[0], start_signal, cf0, cmd0, coordinates[0], read_failed0))
+        cf1_Thread = Thread(target=individual_control, args=(
+            target[0], start_signal, cf1, cmd1, coordinates[1], read_failed1))
+        cf0_Thread.start()
+        cf1_Thread.start()
+        cf0.Start_up(37000)
+        cf1.Start_up(37500)
+        start_signal[0] = 1
+        input("press enter to stop")
+        start_signal[0] = 0
+
+
+def individual_control(target, start_signal, cf, cmd,
+                       coordinates, read_failed):
+    while True:
+        time.sleep(0.01)
+        if read_failed[0] == 0:
+            # print("drone found")
+            cmd.send_setpoint(0, 0, 0, 0)
+            break
+    while start_signal[0] == 1:
+        # updates the coordinate list from the camera feed
+        # updates the drone location and velocity
+        cf.loc, cf.vel = cf.get_loc(
+            coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
+        cf.Go_to(np.array(target), cmd)
+        time.sleep(0.01)
+    for i in range(5):
+        cmd.send_setpoint(0, 0, 0, 20000)
+        time.sleep(0.5)
+
 
 def control(target, link_uri, start_signal):
     """
@@ -130,7 +178,7 @@ def control(target, link_uri, start_signal):
         camera_Thread.start()
         cf = Drone(link_uri)
         cmd = cf.Initialise()
-        while start_signal[0]==0:
+        while start_signal[0] == 0:
             time.sleep(0.1)
         cf.Start_up(37500)
         while True:
@@ -139,7 +187,7 @@ def control(target, link_uri, start_signal):
                 # print("drone found")
                 cmd.send_setpoint(0, 0, 0, 0)
                 break
-        while start_signal[0]==1:
+        while start_signal[0] == 1:
             # updates the coordinate list from the camera feed
             # updates the drone location and velocity
             cf.loc, cf.vel = cf.get_loc(
@@ -147,11 +195,36 @@ def control(target, link_uri, start_signal):
             cf.Go_to(np.array(target), cmd)
             time.sleep(0.01)
         for i in range(5):
-            cmd.send_setpoint(0,0,0,20000)
+            cmd.send_setpoint(0, 0, 0, 20000)
             time.sleep(0.5)
     if type(link_uri) == list:
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"
+        coordinates = [[0, 0, 0], [0, 0, 0]]
+        read_failed0 = [1]
+        read_failed1 = [1]
+        read_failed = [read_failed0, read_failed1]
+        # Initialise
+        camera_Thread = Thread(target=cam.simplified_loop,
+                               args=(coordinates, read_failed))
+        camera_Thread.start()
+        cf0 = Drone(link_uri[0])
+        cf1 = Drone(link_uri[1])
+        cmd0 = cf0.Initialise()
+        cmd1 = cf1.Initialise()
+        while start_signal[0] == 0:
+            time.sleep(0.1)
+        cf0_Thread = Thread(target=individual_control, args=(
+            target[0], start_signal, cf0, cmd0, coordinates[0], read_failed0))
+        cf1_Thread = Thread(target=individual_control, args=(
+            target[0], start_signal, cf1, cmd1, coordinates[1], read_failed1))
+        cf0_Thread.start()
+        cf1_Thread.start()
+        cf0.Start_up(37500)
+        cf1.Start_up(37500)
+
 
 if __name__ == '__main__':
-    simplified_control([0, 0, 0], "radio://0/80/250K")
+    # simplified_control([0, 0, 0], "radio://0/80/250K")
+    link_uri = ["radio://0/80/250K", "radio://0/12/1M"]
+    simplified_control([[0, 0, 0], [0, 0, 0]], link_uri)

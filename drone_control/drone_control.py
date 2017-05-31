@@ -13,6 +13,21 @@ from cflib.crazyflie import Crazyflie
 from cflib.crazyflie.log import LogConfig
 
 
+def get_loc(vc1, ff1, vc2, ff2, vc3, ff3, a, b, c, loc_prev, vel_prev):
+    """ 
+    Return a weighted sum of location from the camera
+    and the previous momentum.
+    """
+    x1, y1 = cam.frame_loc(vc1, ff1, 0)
+    x2, y2 = cam.frame_loc(vc2, ff2, 0)
+    x3, y3 = cam.frame_loc(vc3, ff3, 0)
+    t1, t2, t3 = cam.get_angle(x1, y1), cam.get_angle(
+        x2, y2), cam.get_angle(x3, y3)
+    cam_coord = cam.get_coordinates(t1, t2, t3, a, b, c)
+    loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
+    return loc_current, (loc_current-loc_prev)
+
+
 class Drone():
     """
     Here we are only using the cameras and the onboard
@@ -31,9 +46,6 @@ class Drone():
         self._cf = Crazyflie()
         self.uri = link_uri
         self.target = np.array([0, 0, 0])
-        self.loc_prev = None
-        self.vel_prev = None
-        self.not_found_counter = 0
 
     def Initialise(self):
         """ 

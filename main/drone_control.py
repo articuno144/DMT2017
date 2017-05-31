@@ -47,7 +47,7 @@ class Drone():
         self.cmd.send_setpoint(0, 0, 0, 0)
         return self.cmd
 
-    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-800):
+    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-1500):
         """ PID controller to get to specific location """
         if self.not_found_counter > 10:
             # drone lost
@@ -59,7 +59,7 @@ class Drone():
             roll = - min(max(command[1], -10), 10)
             thrust = min(max(command[2]*3000, -15000), 5000)+35000
             thrust = int(thrust)
-            print(self.loc, self.vel, roll, pitch, thrust)
+            # print(self.loc, self.vel, roll, pitch, thrust)
             self.cmd.send_setpoint(roll, pitch, 0, thrust)
         return
 
@@ -81,7 +81,7 @@ class Drone():
         loc_current = 0.7*cam_coord+0.3*(loc_prev+vel_prev)
         return loc_current, (loc_current-loc_prev)
 
-def simplified_control(target, link_uri, start_signal):
+def simplified_control(target, link_uri):
     """
     The main control function, to be called as a separate thread from the gesture
     recognition part. This function continuously reads the targets and attemps to
@@ -101,7 +101,7 @@ def simplified_control(target, link_uri, start_signal):
         while True:
             time.sleep(0.01)
             if read_failed[0] == 0:
-                print("drone found")
+                # print("drone found")
                 cmd.send_setpoint(0, 0, 0, 0)
                 break
         while True:
@@ -109,7 +109,7 @@ def simplified_control(target, link_uri, start_signal):
             # updates the drone location and velocity
             cf.loc, cf.vel = cf.get_loc(
                 coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
-            cf.Go_to(target, cmd)
+            cf.Go_to(np.array(target), cmd)
             time.sleep(0.01)
     if type(link_uri) == list:
         assert len(target) == len(
@@ -136,7 +136,7 @@ def control(target, link_uri, start_signal):
         while True:
             time.sleep(0.01)
             if read_failed[0] == 0:
-                print("drone found")
+                # print("drone found")
                 cmd.send_setpoint(0, 0, 0, 0)
                 break
         while start_signal[0]==1:
@@ -144,7 +144,7 @@ def control(target, link_uri, start_signal):
             # updates the drone location and velocity
             cf.loc, cf.vel = cf.get_loc(
                 coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
-            cf.Go_to(target, cmd)
+            cf.Go_to(np.array(target), cmd)
             time.sleep(0.01)
         for i in range(5):
             cmd.send_setpoint(0,0,0,20000)
@@ -154,4 +154,4 @@ def control(target, link_uri, start_signal):
             link_uri), "Provide exactly one link_uri for each target location"
 
 if __name__ == '__main__':
-    simplified_control(np.array([0, 0, 0]), "radio://0/80/250K")
+    simplified_control([0, 0, 0], "radio://0/80/250K")

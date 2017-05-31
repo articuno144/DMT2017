@@ -87,11 +87,9 @@ c = 0
 # get training_set
 while True:
     c += 1
-    # ctr+=1
     s = list(s)
     roll = (s[9]-100)*10/3.14
     pitch = (s[10]-100)*10/3.14
-    print(roll, pitch)
     m[0, :49, :] = m[0, 1:, :]
     m[0, 49, :] = standardize(s[3:9])
     if s[0] == 0 and r_prev == 1:
@@ -113,11 +111,11 @@ while True:
         cal[s[1]] = 1
         cali_d = np.concatenate((cali_d, cal.reshape(1, 9)), axis=0)
     if s[0] == 0:
-        if new_noise == None and c > 5 and c < 90:
+        if new_noise == None and c > 5 and c < 95  :
             new_noise = np.array(m)
             new_noised = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1])
-            new_noised = new_noised.reshape((1, 9))
-        elif c > 20 and random.randint(0, 20) > 15:
+            new_noised = new_noised.reshape((1, 9))                  
+        elif c > 20 and random.randint(0, 20) > 12:
             new_noise = np.concatenate((new_noise, np.array(m)), axis=0)
             new_noised = np.concatenate(
                 (new_noised, np.array([0, 0, 0, 0, 0, 0, 0, 0, 1]).reshape((1, 9))), axis=0)
@@ -174,7 +172,7 @@ new_gesture_counter = 0
 
 gesture_window = [8, 8, 8, 8, 8, 8, 8, 8]
 while True:
-    # ctr+=1
+    print(start_signal, target_locked, target)
     s = list(s)
     roll = (s[9]-100)*10/3.14
     pitch = (s[10]-100)*10/3.14
@@ -192,25 +190,24 @@ while True:
     gesture_window[7] = p[1]
     if new_gesture_counter > 0:
         new_gesture_counter += 1
-    if new_gesture_counter > 5:
+    if new_gesture_counter > 20:
         new_gesture_counter = 0
     if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
         if new_gesture_counter == 0:
             new_gesture_counter += 1
-            if gesture_window[3] == 0:
+            if gesture_window[0] == 0:
                 target[2] = 0 - target[2]
-            elif gesture_window[3] == 1:
+            elif gesture_window[0] == 2:
                 target_locked = not target_locked
-            elif gesture_window[3] == 2:
+            elif gesture_window[0] == 1:
                 if start_signal[0] == 0:
                     start_signal[0] = 1
                 else:
                     print("drone landing")
-                    break
 
     buf = p[1]
-    if buf != 8:
-        print('pred: ', buf)
+    # if buf != 8:
+    #     print('pred: ', buf)
     if not target_locked:
-        target[0] = min(max(target[0]+pitch/100,-0.2),0.2)
-        target[1] = min(max(target[1]+roll/100,-0.2),0.2)
+        target[0] = min(max(target[0]+pitch/1000,-0.2),0.2)
+        target[1] = min(max(target[1]+roll/1000,-0.2),0.2)

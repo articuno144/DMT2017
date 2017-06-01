@@ -198,13 +198,14 @@ def control(target, link_uri, start_signal):
     if type(link_uri) == list:
         assert len(target) == len(
             link_uri), "Provide exactly one link_uri for each target location"
-        coordinates = [[0, 0, 0], [0, 0, 0]]
+        c0 = [0,0,0]
+        c1 = [0,0,0]
         read_failed0 = [1]
         read_failed1 = [1]
         read_failed = [read_failed0, read_failed1]
         # Initialise
         camera_Thread = Thread(target=cam.simplified_loop,
-                               args=(coordinates, read_failed, True))
+                               args=([c0,c1], read_failed))
         camera_Thread.start()
         cf0 = Drone(link_uri[0])
         cf1 = Drone(link_uri[1])
@@ -218,8 +219,8 @@ def control(target, link_uri, start_signal):
             target[0], start_signal, cf1, cmd1, coordinates[1], read_failed1))
         cf0_Thread.start()
         cf1_Thread.start()
-        cf0.Start_up(37500)
-        cf1.Start_up(37500)
+        cf0.Start_up(40000)
+        cf1.Start_up(40000)
 
 
 if __name__ == '__main__':

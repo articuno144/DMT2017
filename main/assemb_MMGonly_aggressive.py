@@ -151,9 +151,9 @@ while step * batch_size < training_iters:
     sess.run(second_optimizer, feed_dict={
              x: batch_x, y: batch_y, keep_prob: 0.5, learning_rate: 0.0001})
     sess.run(second_optimizer, feed_dict={
-             x: noise_x, y: noise_y, keep_prob: 0.5, learning_rate: 0.0002})
+             x: noise_x, y: noise_y, keep_prob: 0.5, learning_rate: 0.0005})
     sess.run(second_optimizer, feed_dict={
-             x: new_noise, y: new_noised, keep_prob: 0.5, learning_rate: 0.00002})
+             x: new_noise, y: new_noised, keep_prob: 0.5, learning_rate: 0.00005})
     if step % display_step == 0:
         # Calculate batch accuracy
         acc = sess.run(accuracy, feed_dict={x: np.concatenate(
@@ -177,7 +177,7 @@ def enter_start(start_signal):
         input("press enter to start or stop")
         start_signal[0] = 1 - start_signal[0]
 
-enter_start_thread = Thread(traget=enter_start, args=(start_signal,))
+enter_start_thread = Thread(target=enter_start, args=(start_signal,))
 enter_start_thread.start()
 
 gesture_window = [8, 8, 8, 8, 8, 8, 8, 8]

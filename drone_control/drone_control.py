@@ -108,9 +108,6 @@ def simplified_control(targets, link_uri, start_signal):
         camera_Thread.start()
         cf = Drone(link_uri)
         cmd = cf.Initialise()
-        input("press enter when ready")
-        target_thread = Thread(target=change_location, args=(targets,))
-        target_thread.start()
         input("press enter again")
         cf.Start_up(37500)
         while True:
@@ -130,15 +127,6 @@ def simplified_control(targets, link_uri, start_signal):
         assert len(targets) == len(
             link_uri), "Provide exactly one link_uri for each target location"
 
-def change_location(target):
-    while True:
-        target[0] = -target[0]
-        print("AAAAAA")
-        print("AAAAAA")
-        print("AAAAAA")
-        print("AAAAAA")
-        print("AAAAAA")
-        time.sleep(5)
 
 def control(target, link_uri, start_signal):
     """
@@ -159,9 +147,6 @@ def control(target, link_uri, start_signal):
             time.sleep(0.1)
         cf.Start_up(37500)
 
-        target_thread = Thread(target=change_location, args = (target))
-        target_thread.start()
-
         while True:
             time.sleep(0.01)
             if read_failed[0] == 0:
@@ -181,4 +166,4 @@ def control(target, link_uri, start_signal):
 
 if __name__ == '__main__':
     target=[0.1,0,0]
-    simplified_control(target, "radio://0/80/250K",[0])
+    simplified_control(target, "radio://0/12/1M",[0])

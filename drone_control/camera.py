@@ -5,7 +5,7 @@ cv2.VideoCapture(2).release()
 cv2.VideoCapture(3).release()
 
 cv2.namedWindow("vc1")
-vc1 = cv2.VideoCapture(3)
+vc1 = cv2.VideoCapture(1)
 vc1.set(3, 640)
 vc1.set(4, 240)
 vc1.set(6, 60)

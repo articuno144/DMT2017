@@ -6,11 +6,11 @@ import imutils
 from threading import Thread
 
 # assign new item lower['blue'] = (93, 10, 0)
-lower = {'green': (50, 140, 105), 'orange': (10, 75, 155)}
-upper = {'green': (120, 255, 170), 'orange': (115, 255, 255)}
+lower = {'blue': (85, 165, 50), 'orange': (150, 120, 0)}
+upper = {'blue': (150, 255, 255), 'orange': (200, 255, 255)}
 
 # define standard colors for circle around the object
-colors = {'green': (0, 255, 0), 'orange': (0, 140, 255)}
+colors = {'blue': (0, 0, 255), 'orange': (0, 140, 255)}
 
 
 def get_angle(x, y, w=640, h=480):
@@ -53,12 +53,12 @@ def simplified_loop(coordinates, read_failed, printing=False):
 
 def Init():
     # Cam 0
-    vc0 = cv2.VideoCapture(1)
+    vc0 = cv2.VideoCapture(0)
     vc0.set(3, 640)
     vc0.set(4, 240)
     vc0.set(15, -6)  # exposure
     # Cam 1
-    vc1 = cv2.VideoCapture(2)
+    vc1 = cv2.VideoCapture(1)
     vc1.set(3, 640)
     vc1.set(4, 240)
     vc1.set(15, -6)  # exposure
@@ -138,8 +138,8 @@ def colored_Cam(coordinates, read_failed, vc0, vc1, vc2):
         get_angle(ox0, oy0), get_angle(ox1, oy1), get_angle(ox2, oy2))
     loc_blue = get_coordinates(
         get_angle(bx0, by0), get_angle(bx1, by1), get_angle(bx2, by2))
-    coordinates[0] = list(loc_orange)
-    coordinates[1] = list(loc_blue)
+    coordinates[0][:] = list(loc_orange)[:]
+    coordinates[1][:] = list(loc_blue)[:]
     if ox0*ox1*ox2 != 0 or oy0*oy1*oy2 != 0:  # captured by all 3 cams
         read_failed[0][0] = 0
         print("orange found drone")
@@ -167,6 +167,5 @@ if __name__ == '__main__':
                            args=(coordinates, read_failed, True))
     camera_Thread.start()
     while 1:
-        # print(coordinates)
         time.sleep(1)
     # threaded_loop(vc0, vc1, vc2, first_frame0, first_frame1, first_frame2, "0", "1", "2",)

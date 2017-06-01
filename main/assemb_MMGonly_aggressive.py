@@ -111,10 +111,10 @@ while True:
         cal[s[1]] = 1
         cali_d = np.concatenate((cali_d, cal.reshape(1, 9)), axis=0)
     if s[0] == 0:
-        if new_noise == None and c > 5 and c < 95  :
+        if new_noise == None and c > 5 and c < 95:
             new_noise = np.array(m)
             new_noised = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1])
-            new_noised = new_noised.reshape((1, 9))                  
+            new_noised = new_noised.reshape((1, 9))
         elif c > 20 and random.randint(0, 20) > 12:
             new_noise = np.concatenate((new_noise, np.array(m)), axis=0)
             new_noised = np.concatenate(
@@ -162,13 +162,23 @@ while step * batch_size < training_iters:
               "{:.6f}".format(acc))
     step += 1
 
-target = [0, 0, -0.1]
+target = [[0.15, 0, -0.05],[-0.15,0,-0.15]]
 start_signal = [0]
 target_locked = True
 control_Thread = Thread(target=dc.control,
                         args=(target, "radio://0/80/250K", start_signal))
 control_Thread.start()
 new_gesture_counter = 0
+
+
+def enter_start(start_signal):
+    while True:
+        time.sleep(0.1)
+        input("press enter to start or stop")
+        start_signal[0] = 1 - start_signal[0]
+
+enter_start_thread = Thread(traget=enter_start, args=(start_signal,))
+enter_start_thread.start()
 
 gesture_window = [8, 8, 8, 8, 8, 8, 8, 8]
 while True:
@@ -196,18 +206,19 @@ while True:
         if new_gesture_counter == 0:
             new_gesture_counter += 1
             if gesture_window[0] == 0:
-                target[2] = 0 - target[2]
+                target[0][2] = 0 - target[0][2]
             elif gesture_window[0] == 2:
                 target_locked = not target_locked
             elif gesture_window[0] == 1:
-                if start_signal[0] == 0:
-                    start_signal[0] = 1
-                else:
-                    print("drone landing")
+                pass
+                # if start_signal[0] == 0:
+                #     start_signal[0] = 1
+                # else:
+                #     print("drone landing")
 
     buf = p[1]
     # if buf != 8:
     #     print('pred: ', buf)
     if not target_locked:
-        target[0] = min(max(target[0]+pitch/1000,-0.2),0.2)
-        target[1] = min(max(target[1]+roll/1000,-0.2),0.2)
+        target[0][0] = min(max(target[0][0]+pitch/1000, -0.2), 0.2)
+        target[0][1] = min(max(target[0][1]+roll/1000, -0.2), 0.2)

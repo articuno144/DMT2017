@@ -227,4 +227,4 @@ def control(target, link_uri, start_signal):
 if __name__ == '__main__':
     # simplified_control([0, 0, 0], "radio://0/80/250K")
     link_uri = ["radio://0/80/250K", "radio://0/12/1M"]
-    simplified_control([[0, 0, 0], [0, 0, 0]], link_uri)
+    simplified_control([[0.1, 0, 0], [-0.1, 0, -0.1]], link_uri)

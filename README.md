@@ -31,7 +31,7 @@ Three methods have been tried out to locate the drones.
 
 ##### Movement detection
 
-This method compares the webcam readings with the first frame that it captures. It applies a Gaussian blur on the gray scale each frame and calculates the absolute difference between the real-time frame with the first frame. A threshold is then taken to locate the moving objects. The video in the `PID control for the drones` section shows the result with this method. 
+This method compares the webcam readings with the first frame that it captures. It applies a Gaussian blur on the gray scale each frame and calculates the absolute difference between the real-time frame with the first frame. A threshold is then taken to locate the moving objects. 
 
 A disadvantage with this method is that it is sensitive to ambient light, rendering it unsuitable for the exhibition on 13th June. Furthermore, it is intrinsically difficult to differentiate between two moving drones with this method as each webcam is not able to tell which drone is which. As a result, each pair of webcams would give $\frac{2^2}{2!} = 2$ possible location. We have 3 webcams, giving $3C2 = 3$ pairs, and comparisons are required to reduce the possible locations.
 
@@ -57,4 +57,4 @@ The controller takes in the desired location, and calculates the error in locati
 
 ![PID](https://github.com/articuno144/DMT2017/blob/master/photos/PID.png)
 
-[This video](https://www.youtube.com/watch?v=IBKpXXAWtTo&feature=youtu.be) illustrates the location control working with the drone locating system.
+[This video](https://www.youtube.com/watch?v=IBKpXXAWtTo&feature=youtu.be) illustrates the location control working with the drone locating system (movement detection).

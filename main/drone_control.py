@@ -47,7 +47,7 @@ class Drone():
         self.cmd.send_setpoint(0, 0, 0, 0)
         return self.cmd
 
-    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-1500):
+    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-1000):
         """ PID controller to get to specific location """
         if self.not_found_counter > 10:
             # drone lost
@@ -214,9 +214,9 @@ def control(target, link_uri, start_signal):
         while start_signal[0] == 0:
             time.sleep(0.1)
         cf0_Thread = Thread(target=individual_control, args=(
-            target[0], start_signal, cf0, cmd0, coordinates[0], read_failed0))
+            target[0], start_signal, cf0, cmd0, c0, read_failed0))
         cf1_Thread = Thread(target=individual_control, args=(
-            target[0], start_signal, cf1, cmd1, coordinates[1], read_failed1))
+            target[0], start_signal, cf1, cmd1, c1, read_failed1))
         cf0_Thread.start()
         cf1_Thread.start()
         cf0.Start_up(40000)
@@ -226,6 +226,6 @@ def control(target, link_uri, start_signal):
 if __name__ == '__main__':
     # simplified_control([0, 0, 0], "radio://0/80/250K")
     link_uri = ["radio://0/80/250K","radio://0/12/1M"]
-    simplified_control([[0.1, 0.1, -0.1], [-0.15, -0.15, 0.1]], link_uri)
+    simplified_control([[0.1, 0.1, -0.1], [-0.15, -0.15, 0.15]], link_uri)
 ##    link_uri = "radio://0/80/250K"
 ##    simplified_control([0.1, 0.1, -0.1], link_uri)

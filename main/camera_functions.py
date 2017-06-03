@@ -6,7 +6,7 @@ import imutils
 from threading import Thread
 
 # assign new item lower['blue'] = (93, 10, 0)
-lower = {'blue': (85, 165, 50), 'orange': (150, 120, 0)}
+lower = {'blue': (75, 120, 50), 'orange': (150, 120, 0)}
 upper = {'blue': (150, 255, 255), 'orange': (200, 255, 255)}
 
 # define standard colors for circle around the object
@@ -40,10 +40,10 @@ def get_coordinates(cam1_tan, cam2_tan, cam3_tan, a=0.815, b=0.815, c=0.815):
     return np.array([x, y, z])
 
 
-def simplified_loop(coordinates, read_failed, printing=False):
+def simplified_loop(coordinates, read_failed, printing=False, imshow0=None, imshow1=None, imshow2=None):
     vc0, vc1, vc2 = Init()
     while True:
-        colored_Cam(coordinates, read_failed, vc0, vc1, vc2)
+        colored_Cam(coordinates, read_failed, vc0, vc1, vc2, imshow0, imshow1,imshow2)
         if printing:
             print(coordinates, read_failed)
         key = cv2.waitKey(10)
@@ -126,14 +126,14 @@ def frame_loc(vc, imshow=None):
     return ox, oy, bx, by
 
 
-def colored_Cam(coordinates, read_failed, vc0, vc1, vc2):
+def colored_Cam(coordinates, read_failed, vc0, vc1, vc2, imshow0=None, imshow1=None, imshow2=None):
     """
     coordinates and read_failed have length two, for orange and 
     blue balls.
     """
-    ox0, oy0, bx0, by0 = frame_loc(vc0, imshow='0')
-    ox1, oy1, bx1, by1 = frame_loc(vc1, imshow='1')
-    ox2, oy2, bx2, by2 = frame_loc(vc2, imshow='2')
+    ox0, oy0, bx0, by0 = frame_loc(vc0, imshow0)
+    ox1, oy1, bx1, by1 = frame_loc(vc1, imshow1)
+    ox2, oy2, bx2, by2 = frame_loc(vc2, imshow2)
     loc_orange = get_coordinates(
         get_angle(ox0, oy0), get_angle(ox1, oy1), get_angle(ox2, oy2))
     loc_blue = get_coordinates(
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     #                                 vc0, vc1, vc2, first_frame0, first_frame1,
     #                                 first_frame2, "0", "1", "2",))
     camera_Thread = Thread(target=simplified_loop,
-                           args=(coordinates, read_failed, True))
+                           args=(coordinates, read_failed, True,"0","1","2"))
     camera_Thread.start()
     while 1:
         time.sleep(1)

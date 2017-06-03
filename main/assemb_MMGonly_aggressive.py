@@ -166,7 +166,7 @@ target = [[0.15, 0, -0.05],[-0.15,0,-0.15]]
 start_signal = [0]
 target_locked = True
 control_Thread = Thread(target=dc.control,
-                        args=(target, "radio://0/80/250K", start_signal))
+                        args=(target, ["radio://0/80/250K","radio://0/12/1M"], start_signal))
 control_Thread.start()
 new_gesture_counter = 0
 

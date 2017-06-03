@@ -30,7 +30,7 @@ def maxpool2d(x, k=2):
 
 # Create model
 def conv_net(x, weights, biases, dropout):
-    # Reshape input picture
+    # Reshape input
     x = tf.reshape(x, shape=[-1, n_input,3, 1])
     # Convolution Layer
     conv3 = conv2d(x, weights['wc3'], biases['bc3'])

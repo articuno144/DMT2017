@@ -47,7 +47,7 @@ class Drone():
         self.cmd.send_setpoint(0, 0, 0, 0)
         return self.cmd
 
-    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-1000):
+    def Go_to(self, target, Commander, Kp=30, Ki=0, Kd=-1500):
         """ PID controller to get to specific location """
         if self.not_found_counter > 10:
             # drone lost

@@ -78,7 +78,7 @@ tmp = input("key in anything to start ")
 f = open(r'\\.\pipe\GesturePipe', 'r+b', 0)
 n = struct.unpack('I', f.read(4))[0]    # Read str length
 s = f.read(n)                           # Read str
-f.seek(0)                               # Important!!!
+f.seek(0)                               
 print('Read:', list(s))
 
 
@@ -125,11 +125,11 @@ while True:
     p = process(sess, m)
     p = bytes(p)
     f.write(struct.pack('I', len(p)) + p)   # Write str length and str
-    f.seek(0)                               # EDIT: This is also necessary
+    f.seek(0)                               
 
     n = struct.unpack('I', f.read(4))[0]    # Read str length
     s = f.read(n)                           # Read str
-    f.seek(0)                               # Important!!!
+    f.seek(0)                               
     buf = p[1]
     if buf != 8:
         print('pred: ', buf)
@@ -145,7 +145,7 @@ while step * batch_size < training_iters:
     noise_x, noise_y = noise_values[
         n:n+batch_size, :, :], noised_values[n:n+batch_size, :]
 
-    # Reshape data to get 28 seq of 28 elements
+    # Reshape data 
     #batch_x = batch_x.reshape((batch_size, n_steps, n_input))
     # Run optimization op (backprop)
     sess.run(second_optimizer, feed_dict={
@@ -191,18 +191,20 @@ while True:
     p = process(sess, m)
     p = bytes(p)
     f.write(struct.pack('I', len(p)) + p)   # Write str length and str
-    f.seek(0)                               # EDIT: This is also necessary
+    f.seek(0)                               
 
     n = struct.unpack('I', f.read(4))[0]    # Read str length
     s = f.read(n)                           # Read str
-    f.seek(0)                               # Important!!!
+    f.seek(0)                               
     gesture_window[:7] = gesture_window[1:]
-    gesture_window[7] = p[1]
+gesture_window[7] = p[1]
+# make sure commands are not executed twice
     if new_gesture_counter > 0:
         new_gesture_counter += 1
     if new_gesture_counter > 20:
         new_gesture_counter = 0
-    if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
+if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
+# change drone commands based on the gesture, can be changed easily
         if new_gesture_counter == 0:
             new_gesture_counter += 1
             if gesture_window[0] == 0:
@@ -211,14 +213,7 @@ while True:
                 target_locked = not target_locked
             elif gesture_window[0] == 1:
                 pass
-                # if start_signal[0] == 0:
-                #     start_signal[0] = 1
-                # else:
-                #     print("drone landing")
-
     buf = p[1]
-    # if buf != 8:
-    #     print('pred: ', buf)
     if not target_locked:
         target[0][0] = min(max(target[0][0]+pitch/1000, -0.2), 0.2)
         target[0][1] = min(max(target[0][1]+roll/1000, -0.2), 0.2)

@@ -1,3 +1,2 @@
-model_checkpoint_path: "CNN50_trained"
-all_model_checkpoint_paths: "CNN_MMGonly50_pretrain"
-all_model_checkpoint_paths: "CNN50_trained"
+model_checkpoint_path: "CNN_MMGonly50_xinyang2"
+all_model_checkpoint_paths: "CNN_MMGonly50_xinyang2"

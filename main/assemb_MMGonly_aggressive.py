@@ -182,7 +182,7 @@ enter_start_thread.start()
 
 gesture_window = [8, 8, 8, 8, 8, 8, 8, 8]
 while True:
-    print(start_signal, target_locked, target)
+   # print(start_signal, target_locked, target)
     s = list(s)
     roll = (s[9]-100)*10/3.14
     pitch = (s[10]-100)*10/3.14
@@ -197,14 +197,14 @@ while True:
     s = f.read(n)                           # Read str
     f.seek(0)                               
     gesture_window[:7] = gesture_window[1:]
-gesture_window[7] = p[1]
+    gesture_window[7] = p[1]
 # make sure commands are not executed twice
     if new_gesture_counter > 0:
         new_gesture_counter += 1
     if new_gesture_counter > 20:
         new_gesture_counter = 0
-if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
-# change drone commands based on the gesture, can be changed easily
+    if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
+    # change drone commands based on the gesture, can be changed easily
         if new_gesture_counter == 0:
             new_gesture_counter += 1
             if gesture_window[0] == 0:
@@ -214,6 +214,8 @@ if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
             elif gesture_window[0] == 1:
                 pass
     buf = p[1]
+    if buf != 8:
+        print('pred: ', buf)
     if not target_locked:
         target[0][0] = min(max(target[0][0]+pitch/1000, -0.2), 0.2)
         target[0][1] = min(max(target[0][1]+roll/1000, -0.2), 0.2)

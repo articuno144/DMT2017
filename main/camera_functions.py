@@ -6,8 +6,8 @@ import imutils
 from threading import Thread
 
 # assign new item lower['blue'] = (93, 10, 0)
-lower = {'blue': (75, 120, 50), 'orange': (150, 120, 0)}
-upper = {'blue': (150, 255, 255), 'orange': (200, 255, 255)}
+lower = {'blue': (75, 85, 50), 'orange': (150, 85, 50)}
+upper = {'blue': (125, 255, 255), 'orange': (200, 255, 255)}
 
 # define standard colors for circle around the object
 colors = {'blue': (0, 0, 255), 'orange': (0, 140, 255)}
@@ -163,9 +163,4 @@ if __name__ == '__main__':
     #     target=threaded_loop, args=(coordinates,
     #                                 vc0, vc1, vc2, first_frame0, first_frame1,
     #                                 first_frame2, "0", "1", "2",))
-    camera_Thread = Thread(target=simplified_loop,
-                           args=(coordinates, read_failed, True,"0","1","2"))
-    camera_Thread.start()
-    while 1:
-        time.sleep(1)
-    # threaded_loop(vc0, vc1, vc2, first_frame0, first_frame1, first_frame2, "0", "1", "2",)
+    simplified_loop(coordinates, read_failed, True,"0","1","2")

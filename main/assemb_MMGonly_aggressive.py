@@ -203,16 +203,16 @@ while True:
         new_gesture_counter += 1
     if new_gesture_counter > 20:
         new_gesture_counter = 0
-    if gesture_window[6] == 8 and gesture_window[7] == 8 and gesture_window[5] != 8:
+    if all(pred == 8 for pred in gesture_window[4:]) and gesture_window[3]!=8:
     # change drone commands based on the gesture, can be changed easily
         if new_gesture_counter == 0:
             new_gesture_counter += 1
-            if gesture_window[0] == 0:
-                target[0][2] = 0 - target[0][2]
-            elif gesture_window[0] == 2:
-                target_locked = not target_locked
-            elif gesture_window[0] == 1:
-                pass
+        if gesture_window[0] == 0:
+            target[0][2] = 0 - target[0][2]
+        elif gesture_window[0] == 2:
+            target_locked = not target_locked
+        elif gesture_window[0] == 1:
+            pass
     buf = p[1]
     if buf != 8:
         print('pred: ', buf)

@@ -73,15 +73,15 @@ tmp = input("key in anything to start ")
 f = open(r'\\.\pipe\GesturePipe', 'r+b', 0)
 n = struct.unpack('I', f.read(4))[0]    # Read str length
 s = f.read(n)                           # Read str
-f.seek(0)                               
+f.seek(0)
 print('Read:', list(s))
 
 
-target = [[0.15, 0, -0.05],[-0.15,0,-0.15]]
+target = [[0.15, 0, -0.05], [-0.15, 0, -0.15]]
 start_signal = [0]
-target_locked = True
+target_locked = [True, True]
 control_Thread = Thread(target=dc.control,
-                        args=(target, ["radio://0/80/250K","radio://0/12/1M"], start_signal))
+                        args=(target, ["radio://0/80/250K", "radio://0/12/1M"], start_signal))
 control_Thread.start()
 new_gesture_counter = 0
 
@@ -106,11 +106,11 @@ while True:
     p = process(sess, m)
     p = bytes(p)
     f.write(struct.pack('I', len(p)) + p)   # Write str length and str
-    f.seek(0)                               
+    f.seek(0)
 
     n = struct.unpack('I', f.read(4))[0]    # Read str length
     s = f.read(n)                           # Read str
-    f.seek(0)                               
+    f.seek(0)
     gesture_window[:7] = gesture_window[1:]
     gesture_window[7] = p[1]
 # make sure commands are not executed twice
@@ -118,16 +118,23 @@ while True:
         new_gesture_counter += 1
     if new_gesture_counter > 20:
         new_gesture_counter = 0
-    if all(pred == 8 for pred in gesture_window[4:]) and gesture_window[3]!=8:
-    # change drone commands based on the gesture, can be changed easily
+    if all(pred == 8 for pred in gesture_window[4:]) and gesture_window[3] != 8:
+        # change drone commands based on the gesture, can be changed easily
         if new_gesture_counter == 0:
             new_gesture_counter += 1
         if gesture_window[0] == 0:
-            target[0][2] = 0 - target[0][2]
+            if all(locked == False for locked in target_locked):
+                target_locked[:] = [True, True]
         elif gesture_window[0] == 2:
-            target_locked = not target_locked
+            if all(locked == True for locked in target_locked):
+                target_locked[0] = False
+            elif all(locked==False for locked in target_locked):
+                target_locked[1] = True
+            else:
+                locked = not locked for locked in target_locked
         elif gesture_window[0] == 1:
-            pass
+            for locked in target_locked:
+                locked[2] = 0 - locked[2]
     buf = p[1]
     if buf != 8:
         print('pred: ', buf)

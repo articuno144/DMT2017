@@ -1,2 +1,2 @@
-model_checkpoint_path: "CNN_MMGonly50_xinyang2"
-all_model_checkpoint_paths: "CNN_MMGonly50_xinyang2"
+model_checkpoint_path: "CNN_MMGonly50_yuhang"
+all_model_checkpoint_paths: "CNN_MMGonly50_yuhang"

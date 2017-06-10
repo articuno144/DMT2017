@@ -67,9 +67,8 @@ def standardize(s):
 learning_rate = tf.placeholder("float")
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, 'Saved\\CNN_MMGonly50_yuntao')
+saver.restore(sess, 'Saved\\CNN_MMGonly50_yuntao1')
 
-tmp = input("key in anything to start ")
 f = open(r'\\.\pipe\GesturePipe', 'r+b', 0)
 n = struct.unpack('I', f.read(4))[0]    # Read str length
 s = f.read(n)                           # Read str
@@ -117,24 +116,33 @@ while True:
 # make sure commands are not executed twice
     if new_gesture_counter > 0:
         new_gesture_counter += 1
-    if new_gesture_counter > 20:
+    if new_gesture_counter > 40:
         new_gesture_counter = 0
     if all(pred == 8 for pred in gesture_window[4:]) and gesture_window[3] != 8:
         # change drone commands based on the gesture, can be changed easily
         if new_gesture_counter == 0:
             new_gesture_counter += 1
         if gesture_window[0] == 0:
+            print("00000")
+            print("00000")
+            print("00000")
+            print("00000")            
             if all(locked == False for locked in target_locked):
                 target_locked[:] = [True, True]
         elif gesture_window[0] == 1:
-            if all(locked == True for locked in target_locked):
-                target_locked[0] = False
-            elif all(locked==False for locked in target_locked):
-                target_locked[1] = True
-            else:
-                for locked in target_locked:
-                    locked = not locked
+            print("11111")
+            print("11111")
+            print("11111")
+            print("11111")  
+            if target_locked[0]==target_locked[1]:
+                target_locked[1]=not target_locked[1]
+            for i in range(len(target_locked)):
+                target_locked[i] = not target_locked[i]
         elif gesture_window[0] == 2:
+            print("22222")
+            print("22222")
+            print("22222")
+            print("22222")
             for locked in target:
                 locked[2] = 0 - locked[2]
             if status=='low':
@@ -147,4 +155,5 @@ while True:
     if not target_locked[1]:
         target[1][0] = min(max(target[1][0]+pitch/1000, -0.2), 0.2)
         target[1][1] = min(max(target[1][1]+roll/1000, -0.2), 0.2)
-    print(target_locked, status)
+    buf = p[1]
+    print(buf,target_locked, status, target[0], target[1], roll, pitch)

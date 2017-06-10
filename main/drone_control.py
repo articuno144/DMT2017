@@ -52,7 +52,7 @@ class Drone():
         if self.not_found_counter > 10:
             # drone lost
             Commander.send_setpoint(0, 0, 0, 0)
-            print("shutting down")
+            # print("shutting down")
         else:
             command = (target - self.loc) * Kp + self.vel * Kd
             pitch = min(max(command[0], -10), 10)
@@ -151,7 +151,6 @@ def individual_control(target, start_signal, cf, cmd,
     while start_signal[0] == 1:
         # updates the coordinate list from the camera feed
         # updates the drone location and velocity
-        print("go to")
         cf.loc, cf.vel = cf.get_loc(
             coordinates, read_failed, loc_prev=cf.loc, vel_prev=cf.vel)
         cf.Go_to(np.array(target), cmd)

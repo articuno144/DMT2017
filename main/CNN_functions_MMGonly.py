@@ -52,4 +52,3 @@ def conv_net(x, weights, biases, dropout):
     # Output, class prediction
     out = tf.add(tf.matmul(fc2, weights['out']), biases['out'])
     return out
-

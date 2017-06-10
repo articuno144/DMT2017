@@ -67,7 +67,7 @@ def standardize(s):
 learning_rate = tf.placeholder("float")
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, 'Saved\\CNN_MMGonly50_xinyang')
+saver.restore(sess, 'Saved\\CNN_MMGonly50_yuntao')
 
 tmp = input("key in anything to start ")
 f = open(r'\\.\pipe\GesturePipe', 'r+b', 0)
@@ -85,6 +85,7 @@ control_Thread = Thread(target=dc.control,
 control_Thread.start()
 new_gesture_counter = 0
 
+status = 'low'
 
 def enter_start(start_signal):
     while True:
@@ -125,19 +126,25 @@ while True:
         if gesture_window[0] == 0:
             if all(locked == False for locked in target_locked):
                 target_locked[:] = [True, True]
-        elif gesture_window[0] == 2:
+        elif gesture_window[0] == 1:
             if all(locked == True for locked in target_locked):
                 target_locked[0] = False
             elif all(locked==False for locked in target_locked):
                 target_locked[1] = True
             else:
-                locked = not locked for locked in target_locked
-        elif gesture_window[0] == 1:
-            for locked in target_locked:
+                for locked in target_locked:
+                    locked = not locked
+        elif gesture_window[0] == 2:
+            for locked in target:
                 locked[2] = 0 - locked[2]
-    buf = p[1]
-    if buf != 8:
-        print('pred: ', buf)
-    if not target_locked:
+            if status=='low':
+                status = 'high'
+            else:
+                status = 'low'
+    if not target_locked[0]:
         target[0][0] = min(max(target[0][0]+pitch/1000, -0.2), 0.2)
         target[0][1] = min(max(target[0][1]+roll/1000, -0.2), 0.2)
+    if not target_locked[1]:
+        target[1][0] = min(max(target[1][0]+pitch/1000, -0.2), 0.2)
+        target[1][1] = min(max(target[1][1]+roll/1000, -0.2), 0.2)
+    print(target_locked, status)

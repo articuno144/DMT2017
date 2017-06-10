@@ -59,7 +59,7 @@ class Drone():
             roll = - min(max(command[1], -10), 10)
             thrust = min(max(command[2]*3000, -15000), 5000)+37000
             thrust = int(thrust)
-            print(self.loc, self.vel, roll, pitch, thrust)
+            # print(self.loc, self.vel, roll, pitch, thrust)
             self.cmd.send_setpoint(roll, pitch, 0, thrust)
         return
 

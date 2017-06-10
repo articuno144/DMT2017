@@ -6,7 +6,7 @@ import imutils
 from threading import Thread
 
 # assign new item lower['blue'] = (93, 10, 0)
-lower = {'blue': (75, 85, 50), 'orange': (150, 85, 50)}
+lower = {'blue': (75, 85, 60), 'orange': (150, 85, 50)}
 upper = {'blue': (125, 255, 255), 'orange': (200, 255, 255)}
 
 # define standard colors for circle around the object
@@ -142,12 +142,12 @@ def colored_Cam(coordinates, read_failed, vc0, vc1, vc2, imshow0=None, imshow1=N
     coordinates[1][:] = list(loc_blue)[:]
     if ox0*ox1*ox2 != 0 or oy0*oy1*oy2 != 0:  # captured by all 3 cams
         read_failed[0][0] = 0
-        print("orange found drone")
+        # print("orange found drone")
     else:
         read_failed[0][0] = 1
     if bx0*bx1*bx2 != 0 or by0*by1*by2 != 0:  # captured by all 3 cams
         read_failed[1][0] = 0
-        print("blue found drone")
+        # print("blue found drone")
     else:
         read_failed[1][0] = 1
 

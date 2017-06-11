@@ -1,9 +1,3 @@
-## Changes to be made on the slides
-
-NN - 1st page: NN only, show MMG signal example
-
-add flow charts
-
 ## Presentation Script
 
 #### Gesture Recognition
@@ -16,16 +10,12 @@ Convolutional neural networks, or ConvNets for short, is a type of the neural ne
 
 The accuracy of the calibrated neural network classification is shown here. It is noted that some gestures have achieved particularly good results, like clenching fist, snapping fingers, and double clenching fist. These gestures will be used for the demonstration tomorrow. 
 
-#### Drone Control
-
-For the control of the actual quadcopters, we are applying a feedback loop on the drone location. A PID controller is applied to guide the drones to the target locations based on their actual location and velocity obtained from the camera function. Each drone is declared in python as a drone class object, allowing us to infer the drone locating for a short period if the camera location feed is slightly unstable. The drone library allows us to input the desired roll and pitch angle directly to the drones, allowing us to simplify the system to a second order system, as the x, y coordinates of the drone is proportional to the pitch and roll angles integrated twice with respect to time respectively. The block diagram of the control loop is shown here.
-$$
--A\ddot{x}\approx \phi = K_px+K_d\dot{x}\\
--B\ddot{y}\approx \theta = K_py+K_d\dot{y}\\
-$$
-
 #### Program Architecture
 
-Putting things together, the armband sets the target locations for the drones. The gestures would allow us to switch the control modes to control a single drone, two drones as a group, or lock the drones in their current locations. 
+The drone control receives the target locations from the armband. Various gestures allows us to switch between controlling one drone, two drones as a group, or lock the drones in their current locations. 
 
-However, as each of the parts run at a different frequency, multi-threading is implemented to assemble the parts. The neural network predicts the user gesture 50 times per second in the main python thread, and the camera runs in another thread which loops at 60FPS. Each of the drone runs in its own thread, which calculates the commands 100 times per second. For a demonstration of the results, please come to our booth tomorrow.
+Some tools we used in the program assembly have greatly improved the performance. Firstly, as different parts of  our program runs at different frequency, multi-threading has allowed us to run several loops simultaneously, so that the frequency that the drone receives command is not limited by the other loops.
+
+The C# application form is used to handle communication from the IMU. To pass data between the C# application form and our main script written in python, a named pipe server is created in C#. Through the pipe, C# sends the MMG signals, and receives the gesture classification.
+
+Each actual drone is declared as a drone class object. This has simplified the communication with the drones and allowed us to declare location and velocity as class variables, so that the drone location read from the webcams can be smoothed.

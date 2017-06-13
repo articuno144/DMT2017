@@ -161,7 +161,7 @@ while step * batch_size < training_iters:
         print("Iter " + str(step*batch_size) + ", Minibatch Accuracy= " +
               "{:.6f}".format(acc))
     step += 1
-saver.save(sess, 'Saved\\CNN_MMGonly50_yuhang')
+saver.save(sess, 'Saved\\CNN_MMGonly50_1102')
 while True:
    # print(start_signal, target_locked, target)
     s = list(s)

@@ -67,7 +67,7 @@ def standardize(s):
 learning_rate = tf.placeholder("float")
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, 'Saved\\CNN_MMGonly50_yuntao1')
+saver.restore(sess, 'Saved\\CNN_MMGonly50_1101')
 
 f = open(r'\\.\pipe\GesturePipe', 'r+b', 0)
 n = struct.unpack('I', f.read(4))[0]    # Read str length
@@ -127,7 +127,7 @@ while True:
             print("00000")
             print("00000")
             print("00000")            
-            if all(locked == False for locked in target_locked):
+            if any(locked == False for locked in target_locked):
                 target_locked[:] = [True, True]
         elif gesture_window[0] == 1:
             print("11111")
@@ -150,10 +150,10 @@ while True:
             else:
                 status = 'low'
     if not target_locked[0]:
-        target[0][0] = min(max(target[0][0]+pitch/1000, -0.2), 0.2)
-        target[0][1] = min(max(target[0][1]+roll/1000, -0.2), 0.2)
+        target[0][0] = min(max(target[0][0]+pitch/2000, -0.12), 0.17)
+        target[0][1] = min(max(target[0][1]+roll/2000, -0.12), 0.17)
     if not target_locked[1]:
-        target[1][0] = min(max(target[1][0]+pitch/1000, -0.2), 0.2)
-        target[1][1] = min(max(target[1][1]+roll/1000, -0.2), 0.2)
+        target[1][0] = min(max(target[1][0]+pitch/2000, -0.07), 0.22)
+        target[1][1] = min(max(target[1][1]+roll/2000, -0.07), 0.22)
     buf = p[1]
     print(buf,target_locked, status, target[0], target[1], roll, pitch)

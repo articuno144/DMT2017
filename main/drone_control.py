@@ -171,7 +171,7 @@ def control(target, link_uri, start_signal):
         read_failed = [1]
         # Initialise
         camera_Thread = Thread(target=cam.simplified_loop,
-                               args=(coordinates, read_failed))
+                               args=(coordinates, read_failed,True,"0","1","2"))
         camera_Thread.start()
         cf = Drone(link_uri)
         cmd = cf.Initialise()
@@ -218,13 +218,13 @@ def control(target, link_uri, start_signal):
             target[0], start_signal, cf1, cmd1, c1, read_failed1))
         cf0_Thread.start()
         cf1_Thread.start()
-        cf0.Start_up(40000)
-        cf1.Start_up(40000)
+        # cf0.Start_up(40000)
+        # cf1.Start_up(40000)
 
 
 if __name__ == '__main__':
     # simplified_control([0, 0, 0], "radio://0/80/250K")
     link_uri = ["radio://0/80/250K","radio://0/12/1M"]
-    simplified_control([[0.1, 0.1, -0.1], [-0.15, -0.15, 0.15]], link_uri)
+    simplified_control([[-0.1, -0.1, 0.1],[0.1, 0.1, -0.1]], link_uri)
 ##    link_uri = "radio://0/80/250K"
 ##    simplified_control([0.1, 0.1, -0.1], link_uri)

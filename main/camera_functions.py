@@ -6,7 +6,7 @@ import imutils
 from threading import Thread
 
 # assign new item lower['blue'] = (93, 10, 0)
-lower = {'blue': (75, 85, 60), 'orange': (150, 85, 50)}
+lower = {'blue': (85, 60, 40), 'orange': (135, 60, 40)}
 upper = {'blue': (125, 255, 255), 'orange': (200, 255, 255)}
 
 # define standard colors for circle around the object
@@ -53,20 +53,20 @@ def simplified_loop(coordinates, read_failed, printing=False, imshow0=None, imsh
 
 def Init():
     # Cam 0
-    vc0 = cv2.VideoCapture(0)
+    vc0 = cv2.VideoCapture(3)
     vc0.set(3, 640)
     vc0.set(4, 240)
-    vc0.set(15, -6)  # exposure
+    vc0.set(15, -7)  # exposure
     # Cam 1
-    vc1 = cv2.VideoCapture(1)
+    vc1 = cv2.VideoCapture(0)
     vc1.set(3, 640)
     vc1.set(4, 240)
-    vc1.set(15, -6)  # exposure
+    vc1.set(15, -7)  # exposure
     # Cam 2
-    vc2 = cv2.VideoCapture(3)
+    vc2 = cv2.VideoCapture(1)
     vc2.set(3, 640)
     vc2.set(4, 240)
-    vc2.set(15, -6)  # exposure
+    vc2.set(15, -7)  # exposure
     rval0, frame0 = vc0.read()
     rval1, frame1 = vc1.read()
     rval2, frame2 = vc2.read()
